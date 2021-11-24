@@ -20,12 +20,12 @@ class RecipeSearch:
     None
     """
     def createIndex(self, path: str) -> None:
+        if not os.path.exists("recipe_name_index"):
+            os.mkdir("recipe_name_index")
+
         schema = Schema(
             recipe_name=TEXT,
             recipe_id=NUMERIC(stored=True))
-        
-        if not os.path.exists("recipe_name_index"):
-            os.mkdir("recipe_name_index")
 
         ix = create_in("recipe_name_index", schema)
         ix = open_dir("recipe_name_index")
@@ -45,13 +45,17 @@ class RecipeSearch:
     searchRecipes: finds the most relevant recipes titles
 
     @params
-    query: a query string
-    numResults: the top N number of results to return
+    query: 
+        a query string
+        e.g. "greek salad", "mushroom pizza", "blueberry muffin", etc.
+    numResults: 
+        the top N number of results to return
+        default is 20 results
 
     @output
-    A list of indexes that correspond to the N most relevant query results.
+    A list of recipe_id's that correspond to the most relevant query results.
     """
-    def searchRecipes(self, query: str, numResults: int) -> list:
+    def searchRecipes(self, query: str, numResults: int=20) -> list:
         if not os.path.exists("recipe_name_index"):
             raise RuntimeError("Recipes must be indexed first. Call createIndex at least once before searching for recipes")
 
@@ -61,23 +65,27 @@ class RecipeSearch:
             parser = QueryParser("recipe_name", ix.schema)
             myquery = parser.parse(query)
             queryResults = searcher.search(myquery, limit=numResults)
-            for result in queryResults.items():
-                results.append(result[0])
+            for result in queryResults:
+                results.append(result['recipe_id'])
         return results
 
-"""
+
+# Example Usage Below:
 def main():
+    # create a RecipeSearch object 
     searcher = RecipeSearch()
-    searcher.createIndex(path="datasets/core-data_recipe.csv")
-    res = searcher.searchRecipes(query="pot roast", numResults=10)
-    for r in res:
-        print(r, ",")
-    return
+
+    ### ----- This function only needs to be run once to store index information on your local computer ----- ###
+    # searcher.createIndex(path="../datasets/core-data_recipe.csv")
+    ### ----------------------------------------------------------------------------------------------------- ###
+
+    # search for recipes given a query and an optional number of results
+    res = searcher.searchRecipes(query="blueberry muffin", numResults=10)
+    print(res)
 
 if __name__ == "__main__":
     main()
             
-"""
 
 
 
