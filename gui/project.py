@@ -142,25 +142,25 @@ class Window(QDialog):
         self.PM.setText('Per Meal:')
         self.PSPM.setText('Per Serving Per Meal:')
 
-        self.caloriesPS = self.getCalories()
-        self.caloriesD = self.caloriesPS * self.all_data['servings']
-        self.caloriesPM = self.caloriesD / self.all_data['meals']
-        self.caloriesPSPM = self.caloriesPS / self.all_data['meals']
+        self.caloriesPS = round(self.getCalories(), 2)
+        self.caloriesD = round(self.caloriesPS * self.all_data['servings'], 2)
+        self.caloriesPM = round(self.caloriesD / self.all_data['meals'], 2)
+        self.caloriesPSPM = round(self.caloriesPS / self.all_data['meals'], 2)
 
-        self.proteinD = self.getProtein()
-        self.proteinPS = self.proteinD / self.all_data['servings']
-        self.proteinPM = self.proteinD / self.all_data['meals']
-        self.proteinPSPM = self.proteinPS / self.all_data['meals']
+        self.proteinD = round(self.getProtein(), 2)
+        self.proteinPS = round(self.proteinD / self.all_data['servings'], 2)
+        self.proteinPM = round(self.proteinD / self.all_data['meals'], 2)
+        self.proteinPSPM = round(self.proteinPS / self.all_data['meals'], 2)
 
-        self.fatD = self.getFat()
-        self.fatPS = self.fatD / self.all_data['servings']
-        self.fatPM = self.fatD / self.all_data['meals']
-        self.fatPSPM = self.fatPS / self.all_data['meals']
+        self.fatD = round(self.getFat(), 2)
+        self.fatPS = round(self.fatD / self.all_data['servings'], 2)
+        self.fatPM = round(self.fatD / self.all_data['meals'], 2)
+        self.fatPSPM = round(self.fatPS / self.all_data['meals'], 2)
 
-        self.DV.setText(str(round(self.caloriesD, 2)) + '/' + str(round(self.proteinD, 2)) + 'g/' + str(round(self.fatD, 2)) + 'g')
-        self.PSV.setText(str(round(self.caloriesPS, 2)) + '/' + str(round(self.proteinPS, 2)) + 'g/' + str(round(self.fatPS, 2)) + 'g')
-        self.PMV.setText(str(round(self.caloriesPM, 2)) + '/' + str(round(self.proteinPM, 2)) + 'g/' + str(round(self.fatPM, 2)) + 'g')
-        self.PSPMV.setText(str(round(self.caloriesPSPM, 2)) + '/' + str(round(self.proteinPSPM, 2)) + 'g/' + str(round(self.fatPSPM, 2)) + 'g')
+        self.DV.setText(str(self.caloriesD) + '/' + str(self.proteinD) + 'g/' + str(self.fatD) + 'g')
+        self.PSV.setText(str(self.caloriesPS) + '/' + str(self.proteinPS) + 'g/' + str(self.fatPS) + 'g')
+        self.PMV.setText(str(self.caloriesPM) + '/' + str(self.proteinPM) + 'g/' + str(self.fatPM) + 'g')
+        self.PSPMV.setText(str(self.caloriesPSPM) + '/' + str(self.proteinPSPM) + 'g/' + str(self.fatPSPM) + 'g')
 
     def getCalories(self):
     	if self.activity.currentText() == "light exercise, 1-3 days/week":
