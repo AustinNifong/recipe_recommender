@@ -157,10 +157,10 @@ class Window(QDialog):
         self.fatPM = self.fatD / self.all_data['meals']
         self.fatPSPM = self.fatPS / self.all_data['meals']
 
-        self.DV.setText(str(round(self.caloriesD, 2)) + '/' + str(round(self.proteinD, 2)) + 'g' + '/' + str(round(self.fatD, 2)) + 'g')
-        self.PSV.setText(str(round(self.caloriesPS, 2)) + '/' + str(round(self.proteinPS, 2)) + 'g' + '/' + str(round(self.fatPS, 2)) + 'g')
-        self.PMV.setText(str(round(self.caloriesPM, 2)) + '/' + str(round(self.proteinPM, 2)) + 'g' + '/' + str(round(self.fatPM, 2)) + 'g')
-        self.PSPMV.setText(str(round(self.caloriesPSPM, 2)) + '/' + str(round(self.proteinPSPM, 2)) + 'g' + '/' + str(round(self.fatPSPM, 2)) + 'g')
+        self.DV.setText(str(round(self.caloriesD, 2)) + '/' + str(round(self.proteinD, 2)) + 'g/' + str(round(self.fatD, 2)) + 'g')
+        self.PSV.setText(str(round(self.caloriesPS, 2)) + '/' + str(round(self.proteinPS, 2)) + 'g/' + str(round(self.fatPS, 2)) + 'g')
+        self.PMV.setText(str(round(self.caloriesPM, 2)) + '/' + str(round(self.proteinPM, 2)) + 'g/' + str(round(self.fatPM, 2)) + 'g')
+        self.PSPMV.setText(str(round(self.caloriesPSPM, 2)) + '/' + str(round(self.proteinPSPM, 2)) + 'g/' + str(round(self.fatPSPM, 2)) + 'g')
 
     def getCalories(self):
     	if self.activity.currentText() == "light exercise, 1-3 days/week":
