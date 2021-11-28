@@ -9,7 +9,7 @@ class Window(QDialog):
         super(Window, self).__init__()
         self.setStyleSheet("background-color: pink;")
         self.setWindowTitle("Recipe Recommender and Grocery Shopping")
-        self.setGeometry(300, 150, 1000, 800)
+        self.setGeometry(300, 150, 600, 770)
 
         self.form = QGroupBox("Dietary Metrics")
         self.fname = QLineEdit()
@@ -24,11 +24,13 @@ class Window(QDialog):
         self.activity = QComboBox()
         self.activity.addItems(["little-no exercise", "light exercise, 1-3 days/week", "moderate exercise, 3-5 days/week", "hard exercise, 6-7 days a week", "very hard exercise or 2x training"])
         self.weight = QLineEdit()
+        self.output = QComboBox()
+        self.output.addItems(["Single recipe", "Meal plan"])
         self.servings = QLineEdit()
         self.meals = QLineEdit()
         self.allergies = QLineEdit()
         self.diet = QComboBox()
-        self.diet.addItems(["NA", "vegetarian", "vegan", "pescatarian"])
+        self.diet.addItems(["NA", "vegan"])
         self.pref = QLineEdit()
 
         self.createForm()
@@ -41,52 +43,42 @@ class Window(QDialog):
         mainLayout.addWidget(self.buttonBox)
         self.setLayout(mainLayout)
 
-        self.results = QtWidgets.QLabel(self)
-        self.results.move(460, 480)
-        self.results.resize(65,30)
-        self.CPS = QtWidgets.QLabel(self)
-        self.CPS.move(395, 510)
-        self.CPS.resize(130,30)
-        self.C = QtWidgets.QLabel(self)
-        self.C.move(405, 540)
-        self.C.resize(120,30)
-        self.CPSPM = QtWidgets.QLabel(self)
-        self.CPSPM.move(340, 570)
-        self.CPSPM.resize(185,30)
-        self.CPM = QtWidgets.QLabel(self)
-        self.CPM.move(415, 600)
-        self.CPM.resize(110,30)
+        self.requirements = QtWidgets.QLabel(self)
+        self.requirements.move(240, 470)
+        self.requirements.resize(105,30)
+        self.define = QtWidgets.QLabel(self)
+        self.define.move(230, 500)
+        self.define.resize(125,30)
 
-        self.CPSV = QtWidgets.QLabel(self)
-        self.CPSV.move(535, 510)
-        self.CPSV.resize(55,30)
-        self.CV = QtWidgets.QLabel(self)
-        self.CV.move(535, 540)
-        self.CV.resize(55,30)
-        self.CPSPMV = QtWidgets.QLabel(self)
-        self.CPSPMV.move(535, 570)
-        self.CPSPMV.resize(55,30)
-        self.CPMV = QtWidgets.QLabel(self)
-        self.CPMV.move(535, 600)
-        self.CPMV.resize(55,30)
+        self.D = QtWidgets.QLabel(self)
+        self.D.move(195, 530)
+        self.D.resize(70,30)
+        self.PS = QtWidgets.QLabel(self)
+        self.PS.move(190, 560)
+        self.PS.resize(75,30)
+        self.PM = QtWidgets.QLabel(self)
+        self.PM.move(205, 590)
+        self.PM.resize(60,30)
+        self.PSPM = QtWidgets.QLabel(self)
+        self.PSPM.move(130, 620)
+        self.PSPM.resize(135,30)
+
+        self.DV = QtWidgets.QLabel(self)
+        self.DV.move(270, 530)
+        self.DV.resize(160,30)
+        self.PSV = QtWidgets.QLabel(self)
+        self.PSV.move(270, 560)
+        self.PSV.resize(160,30)
+        self.PMV = QtWidgets.QLabel(self)
+        self.PMV.move(270, 590)
+        self.PMV.resize(160,30)
+        self.PSPMV = QtWidgets.QLabel(self)
+        self.PSPMV.move(270, 620)
+        self.PSPMV.resize(160,30)
   
     def getInfo(self):
-        print("Person First Name : {0}".format(self.fname.text()))
-        print("Person Last Name : {0}".format(self.lname.text()))
-        print("Person Email : {0}".format(self.email.text()))
-        print("Age : {0}".format(self.age.text()))
-        print("Gender : {0}".format(self.gender.text()))
-        print("Height(feet) : {0}".format(self.heightF.currentText()))
-        print("Height(inches) : {0}".format(self.heightI.currentText()))
-        print("Activity : {0}".format(self.activity.currentText()))
-        print("Weight : {0}".format(self.weight.text()))
-        print("Number of Servings : {0}".format(self.servings.text()))
-        print("Meals per Day : {0}".format(self.meals.text()))
-        print("Allergies : {0}".format(self.allergies.text()))
-        print("Diet : {0}".format(self.diet.currentText()))
-        print("Preferred Meals/Ingredients : {0}".format(self.pref.text()))
         self.validateInput()
-        self.printCalories()
+        self.printRequirements()
 
     def validateInput(self):
         self.all_data = {}
@@ -123,6 +115,8 @@ class Window(QDialog):
         else:
             self.all_data['weight'] = 140
 
+        self.all_data['output'] = self.output.currentText()
+
         if self.servings.text().isnumeric():
             self.all_data['servings'] = int(self.servings.text())
         else:
@@ -139,28 +133,34 @@ class Window(QDialog):
 
         self.all_data['preferences'] = self.pref.text().split(", ")
 
-    def printCalories(self):
-        self.results.setText('RESULTS:')
+    def printRequirements(self):
+        self.requirements.setText('REQUIREMENTS:')
+        self.define.setText('Calories/Protein/Fat')
+
+        self.D.setText('Total Daily:')
+        self.PS.setText('Per Serving:')
+        self.PM.setText('Per Meal:')
+        self.PSPM.setText('Per Serving Per Meal:')
 
         self.caloriesPS = self.getCalories()
-        print("Calories per Serving: {0}".format(self.caloriesPS))
-        self.CPS.setText('Calories per Serving:')
-        self.CPSV.setText(str(round(self.caloriesPS, 2)))
-        
-        self.calories = self.caloriesPS * self.all_data['servings']
-        print("Calories: {0}".format(self.calories))
-        self.C.setText('Total DailyCalories:')
-        self.CV.setText(str(round(self.calories, 2)))
-        
+        self.caloriesD = self.caloriesPS * self.all_data['servings']
+        self.caloriesPM = self.caloriesD / self.all_data['meals']
         self.caloriesPSPM = self.caloriesPS / self.all_data['meals']
-        print("Calories per Serving per Meal: {0}".format(self.caloriesPSPM))
-        self.CPSPM.setText('Calories per Serving per Meal:')
-        self.CPSPMV.setText(str(round(self.caloriesPSPM, 2)))
-        
-        self.caloriesPM = self.calories / self.all_data['meals']
-        print("Calories per Meal: {0}".format(self.caloriesPM))
-        self.CPM.setText('Calories per Meal:')
-        self.CPMV.setText(str(round(self.caloriesPM, 2)))
+
+        self.proteinD = self.getProtein()
+        self.proteinPS = self.proteinD / self.all_data['servings']
+        self.proteinPM = self.proteinD / self.all_data['meals']
+        self.proteinPSPM = self.proteinPS / self.all_data['meals']
+
+        self.fatD = self.getFat()
+        self.fatPS = self.fatD / self.all_data['servings']
+        self.fatPM = self.fatD / self.all_data['meals']
+        self.fatPSPM = self.fatPS / self.all_data['meals']
+
+        self.DV.setText(str(round(self.caloriesD, 2)) + '/' + str(round(self.proteinD, 2)) + 'g' + '/' + str(round(self.fatD, 2)) + 'g')
+        self.PSV.setText(str(round(self.caloriesPS, 2)) + '/' + str(round(self.proteinPS, 2)) + 'g' + '/' + str(round(self.fatPS, 2)) + 'g')
+        self.PMV.setText(str(round(self.caloriesPM, 2)) + '/' + str(round(self.proteinPM, 2)) + 'g' + '/' + str(round(self.fatPM, 2)) + 'g')
+        self.PSPMV.setText(str(round(self.caloriesPSPM, 2)) + '/' + str(round(self.proteinPSPM, 2)) + 'g' + '/' + str(round(self.fatPSPM, 2)) + 'g')
 
     def getCalories(self):
     	if self.activity.currentText() == "light exercise, 1-3 days/week":
@@ -198,23 +198,30 @@ class Window(QDialog):
     			return (447.593 + (9.247 * self.all_data['weight'] / 2.205) + (3.098 * (self.all_data['height feet'] * 12 + self.all_data['height inches']) * 2.54) - (4.33 * self.all_data['age'])) * 1.2
     		else:
     			return (267.9775 + (11.322 * self.all_data['weight'] / 2.205) + (3.9485 * (self.all_data['height feet'] * 12 + self.all_data['height inches']) * 2.54) - (5.0035 * self.all_data['age'])) * 1.2
+
+    def getProtein(self):
+        return self.all_data['weight'] / 20 * 7
+
+    def getFat(self):
+        return self.caloriesD * 0.3 / 9
   
     def createForm(self):
         layout = QFormLayout()
-        layout.addRow(QLabel("First Name"), self.fname)
-        layout.addRow(QLabel("Last Name"), self.lname)
-        layout.addRow(QLabel("Email"), self.email)
-        layout.addRow(QLabel("Age"), self.age)
-        layout.addRow(QLabel("Gender"), self.gender)
-        layout.addRow(QLabel("Height(feet)"), self.heightF)
-        layout.addRow(QLabel("Height(inches)"), self.heightI)
-        layout.addRow(QLabel("Activity"), self.activity)
-        layout.addRow(QLabel("Weight(lbs)"), self.weight)
-        layout.addRow(QLabel("Number of Servings"), self.servings)
-        layout.addRow(QLabel("Meals per Day"), self.meals)
-        layout.addRow(QLabel("Food Allergies"), self.allergies)
-        layout.addRow(QLabel("Diet"), self.diet)
-        layout.addRow(QLabel("Preferred Meals/Servings"), self.pref)
+        layout.addRow(QLabel("First Name:"), self.fname)
+        layout.addRow(QLabel("Last Name:"), self.lname)
+        layout.addRow(QLabel("Email:"), self.email)
+        layout.addRow(QLabel("Age:"), self.age)
+        layout.addRow(QLabel("Gender:"), self.gender)
+        layout.addRow(QLabel("Height(feet):"), self.heightF)
+        layout.addRow(QLabel("Height(inches):"), self.heightI)
+        layout.addRow(QLabel("Activity:"), self.activity)
+        layout.addRow(QLabel("Weight(lbs):"), self.weight)
+        layout.addRow(QLabel("Output:"), self.output)
+        layout.addRow(QLabel("Number of Servings:"), self.servings)
+        layout.addRow(QLabel("Meals per Day:"), self.meals)
+        layout.addRow(QLabel("Food Allergies:"), self.allergies)
+        layout.addRow(QLabel("Diet:"), self.diet)
+        layout.addRow(QLabel("Preferred Meals/Servings:"), self.pref)
         self.form.setLayout(layout)
   
 if __name__ == '__main__':
