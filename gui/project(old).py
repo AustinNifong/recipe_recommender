@@ -1,17 +1,12 @@
-from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import *
+
+from PyQt5 import QtWidgets
+from PyQt5.QtWidgets import * 
 import sys
 
-class PageWindow(QtWidgets.QMainWindow):
-    gotoSignal = QtCore.pyqtSignal(str)
-
-    def goto(self, name):
-        self.gotoSignal.emit(name)
-
-class FormWindow(PageWindow):
+class Window(QDialog):
   
     def __init__(self):
-        super().__init__()
+        super(Window, self).__init__()
         self.setStyleSheet("background-color: pink;")
         self.setWindowTitle("Recipe Recommender and Grocery Shopping")
         self.setGeometry(300, 150, 600, 770)
@@ -40,9 +35,9 @@ class FormWindow(PageWindow):
 
         self.createForm()
 
-        self.buttonBox = QDialogButtonBox(QDialogButtonBox.Ok)
+        self.buttonBox = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
         self.buttonBox.accepted.connect(self.getInfo)
-
+        self.buttonBox.rejected.connect(self.reject)
         mainLayout = QVBoxLayout()
         mainLayout.addWidget(self.form)
         mainLayout.addWidget(self.buttonBox)
@@ -80,15 +75,6 @@ class FormWindow(PageWindow):
         self.PSPMV = QtWidgets.QLabel(self)
         self.PSPMV.move(270, 620)
         self.PSPMV.resize(160,30)
-
-        self.searchButton = QtWidgets.QPushButton("Recommendations", self)
-        self.searchButton.clicked.connect(self.make_handleButton("recommendButton"))
-
-    def make_handleButton(self, button):
-        def handleButton():
-            if button == "recommendButton":
-                self.goto("recipes")
-        return handleButton
   
     def getInfo(self):
         self.validateInput()
@@ -237,51 +223,6 @@ class FormWindow(PageWindow):
         layout.addRow(QLabel("Diet:"), self.diet)
         layout.addRow(QLabel("Preferred Meals/Servings:"), self.pref)
         self.form.setLayout(layout)
-
-class RecommendWindow(QDialog, PageWindow):
-  
-    def __init__(self):
-        super().__init__()
-        self.setStyleSheet("background-color: pink;")
-        self.setWindowTitle("Recipe Recommendations")
-        self.setGeometry(300, 150, 600, 770)
-        self.initUI()
-
-    def initUI(self):
-        self.setWindowTitle("Search for something")
-        self.UiComponents()
-
-    def goToMain(self):
-        self.goto("main")
-
-    def UiComponents(self):
-        self.backButton = QtWidgets.QPushButton("BackButton", self)
-        self.backButton.setGeometry(QtCore.QRect(5, 5, 100, 20))
-        self.backButton.clicked.connect(self.goToMain)
-
-class Window(QtWidgets.QMainWindow):
-    def __init__(self, parent = None):
-        super().__init__(parent)
-        self.setGeometry(300, 150, 600, 770)
-        self.stacked_widget = QtWidgets.QStackedWidget()
-        self.setCentralWidget(self.stacked_widget)
-        self.m_pages = {}
-        self.register(FormWindow(), "form")
-        self.register(RecommendWindow(), "recipes")
-        self.goto("form")
-
-    def register(self, widget, name):
-        self.m_pages[name] = widget
-        self.stacked_widget.addWidget(widget)
-        if isinstance(widget, PageWindow):
-            widget.gotoSignal.connect(self.goto)
-
-    @QtCore.pyqtSlot(str)
-    def goto(self, name):
-        if name in self.m_pages:
-            widget = self.m_pages[name]
-            self.stacked_widget.setCurrentWidget(widget)
-            self.setWindowTitle(widget.windowTitle())
   
 if __name__ == '__main__':
     app = QApplication(sys.argv)
