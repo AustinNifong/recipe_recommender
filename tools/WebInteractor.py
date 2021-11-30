@@ -3,12 +3,15 @@ from selenium.webdriver.support.select import Select
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.firefox.options import Options
 
 
 test = "Hello world"
 
 #if using Safari, enable remote automation (under develop on the toolbar)
-driver = webdriver.Firefox()
+options = Options()
+options.headless = True
+driver = webdriver.Firefox(options=options)
 driver.get('https://www.amazon.com/afx/ingredients/verify')
 
 #Attempting to offer dropdown menu selection
