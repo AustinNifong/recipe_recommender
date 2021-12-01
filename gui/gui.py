@@ -1,6 +1,91 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import *
 import sys
+import pandas as pd
+import numpy as np
+import random
+
+df_recipes = pd.read_csv("../datasets/Recipes.csv")
+df_ing = pd.read_csv("../datasets/Ingredients.csv")
+df_rec2ing = pd.read_csv("../datasets/Rec2Ing.csv")
+
+#Searches through recipe title and ingredient title to find ones that CONTAINS the allergen
+#Then filters the df_recipes dataframe to remove the allergens containing recipes
+#Doing it this way to reduce time taken on merging datasets
+#Searches based on df.str.contains function 
+#Applies it directly to the df_recipes dataframe
+def allergy_filter(allergies):
+    if len(allergies)>=1 and allergies[0]!='':
+        alg = [i+'*' for i in allergies]
+        
+        #get all ingredients whose name matches the allergies; merge it with rec2ing to get a list of recipeIDs
+        dfi = df_ing[df_ing.IngredientName.str.lower().str.contains('|'.join(alg), na=False, regex=True)]
+        rec2ingID_list = list(df_rec2ing.merge(dfi, on='IngredientID')['RecipeID'])
+        
+        #get all recipes whose title matches the allergies
+        recList = list(df_recipes[df_recipes.Title.str.lower().str.contains('|'.join(alg), na=False, regex=True)]['RecipeID'])
+        recList.append(rec2ingID_list)
+        dfr = df_recipes[~df_recipes.RecipeID.isin(recList)]
+    else:
+        dfr = df_recipes
+    
+    return dfr
+
+#Filter the inputted df using the isVegan attribute based on user input
+def vegan_filter(vegan, dfr):
+    if vegan == 'Vegan':
+        df = dfr[dfr.isVegan=='1']
+    elif vegan == "Strictly not vegan":
+        df = dfr[dfr.isVegan=='0']
+    else:
+        df = dfr
+        
+    return df
+
+#Exactly the same as allergy_filter. Only this time we return the df elemtns containing the search_term
+def search_filter(search_term, df):
+    if len(search_term)>=1 and search_term[0]!='':
+        srch = [i+'*' for i in search_term]
+
+        #get all ingredients whose name matches the allergies; merge it with rec2ing to get a list of recipeIDs
+        dfi = df_ing[df_ing.IngredientName.str.lower().str.contains('|'.join(srch), na=False, regex=True)]
+        rec2ingID_list = list(df_rec2ing.merge(dfi, on='IngredientID')['RecipeID'])
+
+        #get all recipes whose title matches the allergies
+        recList = list(df[df.Title.str.lower().str.contains('|'.join(srch), na=False, regex=True)]['RecipeID'])
+        recList.append(rec2ingID_list)
+        dfr = df[df.RecipeID.isin(recList)]
+    else:
+        dfr = df
+    
+    return dfr
+
+#Filters based on calculated nutritional facts adding a +/- 10% buffer
+def cal_filter(cal, protein, fat, df):
+    return df[(df.Calories >= 0.9*cal) & (df.Calories <= 1.1*cal) & (df.Protein >= 0.9*protein) & (df.Protein >= 0.9*protein) & (df.Fats >= 0.9*fat) & (df.Fats >= 0.9*fat)]
+
+#Incorporates the above functions to return a list of recipe IDs for individual recipe search
+def ind_recipes(x, cals, protein, fat, search_term, vegan, allergies):
+    df = cal_filter(cals, protein, fat, search_filter(search_term, vegan_filter(vegan, allergy_filter(allergies))))
+    df = df[df.No_of_reviews >= 10]
+    df['score'] = (df.Average_rating*np.log10(df.No_of_reviews)) - (x*df.Prep_time/60)
+    df.sort_values('score', ascending=False, inplace=True)
+    ind_list = list(df['RecipeID'].iloc[0:14])
+    filtered_list = random.sample(ind_list, k = 5)
+    return filtered_list
+
+#Uses the above functions (not ind_recipes) to return a list of lists
+#Each child list corresponds to the meals (so 4 child lists for 4 meals/day)
+#Each element in the child list corresponds to the recipe options user can select from (3/5 options per child list - defined by k)
+def meal_plan(x, cals, protein, fat, vegan, allergies, meals):
+    df = cal_filter(cals, protein, fat, vegan_filter(vegan, allergy_filter(allergies)))
+    df = df[df.No_of_reviews >= 10]
+    df['score'] = (df.Average_rating*np.log10(df.No_of_reviews)) - (x*df.Prep_time/60)
+    df.sort_values('score', ascending=False, inplace=True)
+    ind_list = list(df['RecipeID'].iloc[0:5*meals])
+    filtered_list = [random.sample(ind_list, k = 3) for i in range(0,meals)]
+    return filtered_list
+
 
 class stacked(QWidget):
 
@@ -19,11 +104,11 @@ class stacked(QWidget):
       self.output = QComboBox()
       self.output.addItems(["Single recipe", "Meal plan"])
       self.prep = QComboBox()
-      self.prep.addItems(["Strongly Disagree", "Disagree", "Neutral", "Agree", "Strongly Agree"])
+      self.prep.addItems(["Low", "Medium", "High"])
       self.meals = QLineEdit()
       self.allergies = QLineEdit()
       self.diet = QComboBox()
-      self.diet.addItems(["NA", "vegan"])
+      self.diet.addItems(["NA", "Vegan"])
       self.pref = QLineEdit()
 
       self.all_data = {}
@@ -34,7 +119,7 @@ class stacked(QWidget):
       self.all_data['activity'] = ""
       self.all_data['weight'] = 140
       self.all_data['output'] = ""
-      self.all_data['prep'] = "Neutral"
+      self.all_data['prep'] = "Medium"
       self.all_data['meals'] = 3
       self.all_data['allergies'] = ""
       self.all_data['diet'] = ""
@@ -59,7 +144,7 @@ class stacked(QWidget):
 
       self.setLayout(hbox)
       self.leftlist.currentRowChanged.connect(self.display)
-      self.setGeometry(300, 150, 640, 770)
+      self.setGeometry(300, 150, 770, 770)
       self.setWindowTitle('Recipe Recommender and Grocery Shopping')
       self.show()
 
@@ -168,32 +253,32 @@ class stacked(QWidget):
       layout.addRow(QLabel("Activity:"), self.activity)
       layout.addRow(QLabel("Weight(lbs):"), self.weight)
       layout.addRow(QLabel("Output:"), self.output)
-      layout.addRow(QLabel("Does Prep Time Matter?"), self.prep)
+      layout.addRow(QLabel("Time Spent Cooking?"), self.prep)
       layout.addRow(QLabel("Meals per Day:"), self.meals)
       layout.addRow(QLabel("Food Allergies:"), self.allergies)
       layout.addRow(QLabel("Diet:"), self.diet)
-      layout.addRow(QLabel("Preferred Meals/Ingredients:"), self.pref)
+      layout.addRow(QLabel("Preferred Ingredient (required for individual recipe):"), self.pref)
       
       self.buttonBox = QDialogButtonBox(QDialogButtonBox.Ok)
       self.buttonBox.accepted.connect(self.getInfo)
       layout.addWidget(self.buttonBox)
 
       self.requirements = QtWidgets.QLabel(self)
-      self.requirements.move(280, 570)
+      self.requirements.move(330, 570)
       self.requirements.resize(505,30)
 
       self.D = QtWidgets.QLabel(self)
-      self.D.move(290, 600)
+      self.D.move(340, 600)
       self.D.resize(70,30)
       self.PM = QtWidgets.QLabel(self)
-      self.PM.move(295, 630)
+      self.PM.move(345, 630)
       self.PM.resize(60,30)
 
       self.DV = QtWidgets.QLabel(self)
-      self.DV.move(365, 600)
+      self.DV.move(415, 600)
       self.DV.resize(160,30)
       self.PMV = QtWidgets.QLabel(self)
-      self.PMV.move(360, 630)
+      self.PMV.move(410, 630)
       self.PMV.resize(160,30)
 
       self.stack1.setLayout(layout)
@@ -201,19 +286,42 @@ class stacked(QWidget):
    def stack2UI(self):
       layout = QFormLayout()
 
-      if self.all_data['output'] == 'Single Recipe':
+      if self.all_data['prep'] == "Low":
+         x = 1
+      elif self.all_data['prep'] == "Medium":
+         x = 3
+      else:
+         x = 5
+
+      if self.all_data['output'] == 'Single recipe':
          self.rec = QtWidgets.QLabel(self)
          self.rec.setText('Recommended Recipes:')
          layout.addWidget(self.rec)
+
+         r = ind_recipes(x, self.caloriesPM, self.proteinPM, self.fatPM, self.all_data['preferences'], self.all_data['diet'], self.all_data['allergies'])
+
+         recipes = QHBoxLayout()
+         recipes.addWidget(QRadioButton(df_recipes.loc[df_recipes['RecipeID'] == r[0], 'Title'].iloc[0]))
+         recipes.addWidget(QRadioButton(df_recipes.loc[df_recipes['RecipeID'] == r[1], 'Title'].iloc[0]))
+         recipes.addWidget(QRadioButton(df_recipes.loc[df_recipes['RecipeID'] == r[2], 'Title'].iloc[0]))
+         recipes.addWidget(QRadioButton(df_recipes.loc[df_recipes['RecipeID'] == r[3], 'Title'].iloc[0]))
+         recipes.addWidget(QRadioButton(df_recipes.loc[df_recipes['RecipeID'] == r[4], 'Title'].iloc[0]))
+         layout.addRow(recipes)
       else:
          self.rec = QtWidgets.QLabel(self)
          self.rec.setText('Recommended Meal Plans:')
          layout.addWidget(self.rec)
+
+         r = meal_plan(x, self.caloriesPM, self.proteinPM, self.fatPM, self.all_data['diet'], self.all_data['allergies'], self.all_data['meals'])
+
+         print(r)
+
+         plan = QHBoxLayout()
+         plan.addWidget(QRadioButton("Meal Plan 1"))
+         plan.addWidget(QRadioButton("Meal Plan 2"))
+         plan.addWidget(QRadioButton("Meal Plan 3"))
+         layout.addRow(plan)
       
-      sex = QHBoxLayout()
-      sex.addWidget(QRadioButton("Male"))
-      sex.addWidget(QRadioButton("Female"))
-      layout.addRow(sex)
       self.stack2.setLayout(layout)
 		
    def display(self,i):
