@@ -59,7 +59,7 @@ class stacked(QWidget):
 
       self.setLayout(hbox)
       self.leftlist.currentRowChanged.connect(self.display)
-      self.setGeometry(300, 150, 600, 770)
+      self.setGeometry(300, 150, 640, 770)
       self.setWindowTitle('Recipe Recommender and Grocery Shopping')
       self.show()
 
@@ -179,21 +179,21 @@ class stacked(QWidget):
       layout.addWidget(self.buttonBox)
 
       self.requirements = QtWidgets.QLabel(self)
-      self.requirements.move(240, 570)
+      self.requirements.move(280, 570)
       self.requirements.resize(505,30)
 
       self.D = QtWidgets.QLabel(self)
-      self.D.move(250, 600)
+      self.D.move(290, 600)
       self.D.resize(70,30)
       self.PM = QtWidgets.QLabel(self)
-      self.PM.move(255, 630)
+      self.PM.move(295, 630)
       self.PM.resize(60,30)
 
       self.DV = QtWidgets.QLabel(self)
-      self.DV.move(325, 600)
+      self.DV.move(365, 600)
       self.DV.resize(160,30)
       self.PMV = QtWidgets.QLabel(self)
-      self.PMV.move(320, 630)
+      self.PMV.move(360, 630)
       self.PMV.resize(160,30)
 
       self.stack1.setLayout(layout)
@@ -201,9 +201,14 @@ class stacked(QWidget):
    def stack2UI(self):
       layout = QFormLayout()
 
-      self.rec = QtWidgets.QLabel(self)
-      self.rec.setText('Recommended Options:')
-      layout.addWidget(self.rec)
+      if self.all_data['output'] == 'Single Recipe':
+         self.rec = QtWidgets.QLabel(self)
+         self.rec.setText('Recommended Recipes:')
+         layout.addWidget(self.rec)
+      else:
+         self.rec = QtWidgets.QLabel(self)
+         self.rec.setText('Recommended Meal Plans:')
+         layout.addWidget(self.rec)
       
       sex = QHBoxLayout()
       sex.addWidget(QRadioButton("Male"))
