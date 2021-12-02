@@ -197,7 +197,10 @@ class stacked(QWidget):
       self.all_data['preferences'] = self.pref.text().split(", ")
 
    def printRequirements(self):
+      myFont = QtGui.QFont()
+      myFont.setBold(True)
       self.requirements.setText('REQUIREMENTS (Calories/Protein/Fat):')
+      self.requirements.setFont(myFont)
 
       self.D.setText('Total Daily:')
       self.PM.setText('Per Meal:')
@@ -258,6 +261,12 @@ class stacked(QWidget):
       return self.caloriesD * 0.3 / 9
 
    def getIngredients(self):
+      self.requirements.setText('')
+      self.D.setText('')
+      self.PM.setText('')
+      self.DV.setText('')
+      self.PMV.setText('')
+
       if self.all_data['output'] == 'Single recipe':
          idd = df_recipes.loc[df_recipes['Title'] == self.r1.text().split('\n')[0], 'RecipeID'].iloc[0]
          ingg = df_rec2ing.loc[df_rec2ing['RecipeID'] == idd, 'IngredientID'].tolist()
@@ -317,6 +326,7 @@ class stacked(QWidget):
       self.stack1.setLayout(layout)
 		
    def stack2UI(self):
+
       layout = QFormLayout()
 
       if self.all_data['prep'] == "Low":
@@ -328,9 +338,13 @@ class stacked(QWidget):
 
       linkTemplate = '<a href={0}>{1}</a>'
 
+      myFont = QtGui.QFont()
+      myFont.setBold(True)
+
       if self.all_data['output'] == 'Single recipe':
          self.rec = QtWidgets.QLabel(self)
          self.rec.setText('Recommended Recipes:')
+         self.rec.setFont(myFont)
          layout.addWidget(self.rec)
 
          r = ind_recipes(x, self.caloriesPM, self.proteinPM, self.fatPM, self.all_data['preferences'], self.all_data['diet'], self.all_data['allergies'])
@@ -453,6 +467,7 @@ class stacked(QWidget):
       else:
          self.rec = QtWidgets.QLabel(self)
          self.rec.setText('Recommended Meal Plans:')
+         self.rec.setFont(myFont)
          layout.addWidget(self.rec)
 
          m = meal_plan(x, self.caloriesPM, self.proteinPM, self.fatPM, self.all_data['diet'], self.all_data['allergies'], self.all_data['meals'])
@@ -541,8 +556,12 @@ class stacked(QWidget):
 
       linkTemplate = '<a href={0}>{1}</a>'
 
+      myFont = QtGui.QFont()
+      myFont.setBold(True)
+      
       self.rec = QtWidgets.QLabel(self)
       self.rec.setText('Ingredients:')
+      self.rec.setFont(myFont)
       layout.addWidget(self.rec)
 
       self.ingr = QtWidgets.QLabel(self)
