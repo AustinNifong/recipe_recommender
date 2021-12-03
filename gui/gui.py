@@ -166,7 +166,7 @@ class stacked(QWidget):
 
       self.setLayout(hbox)
       self.leftlist.currentRowChanged.connect(self.display)
-      self.setGeometry(300, 150, 770, 770)
+      self.setGeometry(300, 50, 770, 770)
       self.setWindowTitle('Recipe Recommender and Grocery Shopping')
       self.show()
 
@@ -276,56 +276,136 @@ class stacked(QWidget):
       self.DV.setText('')
       self.PMV.setText('')
 
+      linkTemplate = '<a href={0}>{1}</a>'
+
       if self.all_data['output'] == 'Single recipe':
-         idd = df_recipes.loc[df_recipes['Title'] == self.r1.text().split('\n')[0], 'RecipeID'].iloc[0]
+         if self.r1.isChecked():
+            idd = df_recipes.loc[df_recipes['Title'] == self.r1.text().split('\n')[0], 'RecipeID'].iloc[0]
+         elif self.r2.isChecked():
+            idd = df_recipes.loc[df_recipes['Title'] == self.r2.text().split('\n')[0], 'RecipeID'].iloc[0]
+         elif self.r3.isChecked():
+            idd = df_recipes.loc[df_recipes['Title'] == self.r3.text().split('\n')[0], 'RecipeID'].iloc[0]
+         elif self.r4.isChecked():
+            idd = df_recipes.loc[df_recipes['Title'] == self.r4.text().split('\n')[0], 'RecipeID'].iloc[0]
+         elif self.r5.isChecked():
+            idd = df_recipes.loc[df_recipes['Title'] == self.r5.text().split('\n')[0], 'RecipeID'].iloc[0]
          idds = [idd]
          ingg = df_rec2ing.loc[df_rec2ing['RecipeID'] == idd, 'IngredientID'].tolist()
          ing = ""
          for i in ingg:
             ing += df_ing.loc[df_ing['IngredientID'] == i, 'IngredientName'].iloc[0]
             ing += '\n'
+
+         self.url = df_recipes.loc[df_recipes['RecipeID'] == idd, 'Image'].iloc[0] 
+         self.data = urllib.request.urlopen(self.url).read()
+         self.pixmap = QPixmap()
+         self.pixmap.loadFromData(self.data)
+         self.pixmap = self.pixmap.scaled(250, 200)
+         self.im1.setPixmap(self.pixmap)
+         self.layout2.addWidget(self.im1)
+
+         self.link1.setText(linkTemplate.format('https://www.allrecipes.com/recipe/' + str(idd), 'Link to Recipe'))
+         self.link1.setOpenExternalLinks(True)
+         self.layout2.addWidget(self.link1)
       else:
+         if self.m1.isChecked():
+            mm = [self.m1.text().split('\n')[2], self.m1.text().split('\n')[10], self.m1.text().split('\n')[18]]
+         elif self.m2.isChecked():
+            mm = [self.m2.text().split('\n')[2], self.m2.text().split('\n')[10], self.m2.text().split('\n')[18]]
+         elif self.m3.isChecked():
+            mm = [self.m3.text().split('\n')[2], self.m3.text().split('\n')[10], self.m3.text().split('\n')[18]]
          idds = []
          ing = ""
-         for l in [self.m1.text().split('\n')[2], self.m1.text().split('\n')[10], self.m1.text().split('\n')[18]]:
-            idd = df_recipes.loc[df_recipes['Title'] == l, 'RecipeID'].iloc[0]
-            idds.append(idd)
-            ingg = df_rec2ing.loc[df_rec2ing['RecipeID'] == idd, 'IngredientID'].tolist()
-            for i in ingg:
-               if df_ing.loc[df_ing['IngredientID'] == i, 'IngredientName'].iloc[0] not in ing:
-                  ing += df_ing.loc[df_ing['IngredientID'] == i, 'IngredientName'].iloc[0]
-                  ing += '\n'
+
+         idd = df_recipes.loc[df_recipes['Title'] == mm[0], 'RecipeID'].iloc[0]
+         idds.append(idd)
+         ingg = df_rec2ing.loc[df_rec2ing['RecipeID'] == idd, 'IngredientID'].tolist()
+
+         self.url = df_recipes.loc[df_recipes['RecipeID'] == idd, 'Image'].iloc[0] 
+         self.data = urllib.request.urlopen(self.url).read()
+         self.pixmap = QPixmap()
+         self.pixmap.loadFromData(self.data)
+         self.pixmap = self.pixmap.scaled(170, 120)
+         self.im1.setPixmap(self.pixmap)
+         self.layout2.addWidget(self.im1)
+
+         self.link1.setText(linkTemplate.format('https://www.allrecipes.com/recipe/' + str(idd), 'Link to Recipe'))
+         self.link1.setOpenExternalLinks(True)
+         self.layout2.addWidget(self.link1)
+
+         for i in ingg:
+            if df_ing.loc[df_ing['IngredientID'] == i, 'IngredientName'].iloc[0] not in ing:
+               ing += df_ing.loc[df_ing['IngredientID'] == i, 'IngredientName'].iloc[0]
+               ing += '\n'
+
+         idd = df_recipes.loc[df_recipes['Title'] == mm[1], 'RecipeID'].iloc[0]
+         idds.append(idd)
+         ingg = df_rec2ing.loc[df_rec2ing['RecipeID'] == idd, 'IngredientID'].tolist()
+
+         self.url = df_recipes.loc[df_recipes['RecipeID'] == idd, 'Image'].iloc[0] 
+         self.data = urllib.request.urlopen(self.url).read()
+         self.pixmap = QPixmap()
+         self.pixmap.loadFromData(self.data)
+         self.pixmap = self.pixmap.scaled(170, 120)
+         self.im2.setPixmap(self.pixmap)
+         self.layout2.addWidget(self.im2)
+
+         self.link2.setText(linkTemplate.format('https://www.allrecipes.com/recipe/' + str(idd), 'Link to Recipe'))
+         self.link2.setOpenExternalLinks(True)
+         self.layout2.addWidget(self.link2)
+
+         for i in ingg:
+            if df_ing.loc[df_ing['IngredientID'] == i, 'IngredientName'].iloc[0] not in ing:
+               ing += df_ing.loc[df_ing['IngredientID'] == i, 'IngredientName'].iloc[0]
+               ing += '\n'
+
+         idd = df_recipes.loc[df_recipes['Title'] == mm[2], 'RecipeID'].iloc[0]
+         idds.append(idd)
+         ingg = df_rec2ing.loc[df_rec2ing['RecipeID'] == idd, 'IngredientID'].tolist()
+
+         self.url = df_recipes.loc[df_recipes['RecipeID'] == idd, 'Image'].iloc[0] 
+         self.data = urllib.request.urlopen(self.url).read()
+         self.pixmap = QPixmap()
+         self.pixmap.loadFromData(self.data)
+         self.pixmap = self.pixmap.scaled(170, 120)
+         self.im3.setPixmap(self.pixmap)
+         self.layout2.addWidget(self.im3)
+
+         self.link3.setText(linkTemplate.format('https://www.allrecipes.com/recipe/' + str(idd), 'Link to Recipe'))
+         self.link3.setOpenExternalLinks(True)
+         self.layout2.addWidget(self.link3)
+
+         for i in ingg:
+            if df_ing.loc[df_ing['IngredientID'] == i, 'IngredientName'].iloc[0] not in ing:
+               ing += df_ing.loc[df_ing['IngredientID'] == i, 'IngredientName'].iloc[0]
+               ing += '\n'
       
       self.stack3UI(ing, idds)
 
    def openAmazon(self):
-      # driver = webdriver.Firefox()
-      driver = webdriver.Safari()
+      driver = webdriver.Chrome()
       driver.get("file://" + os.path.realpath("toAmazon.html"))
-      # driver.find_element_by_name('button').click()
-      # driver.find_element('button').click()
-      driver.implicitly_wait(10)
-      element = driver.find_element('button', "Buy on Amazon")
-      # element.send_keys(Keys.RETURN)
+      driver.find_element_by_name('button').click()
+      driver.find_element('button').click()
 		
    def stack1UI(self):
-      layout = QFormLayout()
-      layout.addRow(QLabel("Age:"), self.age)
-      layout.addRow(QLabel("Gender:"), self.gender)
-      layout.addRow(QLabel("Height(feet):"), self.heightF)
-      layout.addRow(QLabel("Height(inches):"), self.heightI)
-      layout.addRow(QLabel("Activity:"), self.activity)
-      layout.addRow(QLabel("Weight(lbs):"), self.weight)
-      layout.addRow(QLabel("Output:"), self.output)
-      layout.addRow(QLabel("Time Spent Cooking?"), self.prep)
-      layout.addRow(QLabel("Meals per Day:"), self.meals)
-      layout.addRow(QLabel("Food Allergies:"), self.allergies)
-      layout.addRow(QLabel("Diet:"), self.diet)
-      layout.addRow(QLabel("Preferred Ingredient (required for individual recipe):"), self.pref)
+      self.layout1 = QFormLayout()
+      self.layout1.addRow(QLabel("Age:"), self.age)
+      self.layout1.addRow(QLabel("Gender:"), self.gender)
+      self.layout1.addRow(QLabel("Height(feet):"), self.heightF)
+      self.layout1.addRow(QLabel("Height(inches):"), self.heightI)
+      self.layout1.addRow(QLabel("Activity:"), self.activity)
+      self.layout1.addRow(QLabel("Weight(lbs):"), self.weight)
+      self.layout1.addRow(QLabel("Output:"), self.output)
+      self.layout1.addRow(QLabel("Time Spent Cooking?"), self.prep)
+      self.layout1.addRow(QLabel("Meals per Day:"), self.meals)
+      self.layout1.addRow(QLabel("Food Allergies:"), self.allergies)
+      self.layout1.addRow(QLabel("Diet:"), self.diet)
+      self.layout1.addRow(QLabel("Preferred Ingredient (required for individual recipe):"), self.pref)
       
       self.buttonBox = QDialogButtonBox(QDialogButtonBox.Ok)
       self.buttonBox.accepted.connect(self.getInfo)
-      layout.addWidget(self.buttonBox)
+      self.layout1.addWidget(self.buttonBox)
 
       self.requirements = QtWidgets.QLabel(self)
       self.requirements.move(330, 570)
@@ -345,10 +425,10 @@ class stacked(QWidget):
       self.PMV.move(410, 630)
       self.PMV.resize(160,30)
 
-      self.stack1.setLayout(layout)
+      self.stack1.setLayout(self.layout1)
 		
    def stack2UI(self):
-      layout = QFormLayout()
+      self.layout2 = QFormLayout()
 
       if self.all_data['prep'] == "Low":
          x = 1
@@ -357,8 +437,6 @@ class stacked(QWidget):
       else:
          x = 5
 
-      linkTemplate = '<a href={0}>{1}</a>'
-
       myFont = QtGui.QFont()
       myFont.setBold(True)
 
@@ -366,7 +444,7 @@ class stacked(QWidget):
          self.rec = QtWidgets.QLabel(self)
          self.rec.setText('Recommended Recipes:')
          self.rec.setFont(myFont)
-         layout.addWidget(self.rec)
+         self.layout2.addWidget(self.rec)
 
          recipes = QHBoxLayout()
 
@@ -409,87 +487,12 @@ class stacked(QWidget):
          recipes.addWidget(self.r4)
          recipes.addWidget(self.r5)
 
-         layout.addRow(recipes)
-
-         self.im = QtWidgets.QLabel(self)
-         self.im.move(100, 100)
-         self.url = df_recipes.loc[df_recipes['RecipeID'] == r[0], 'Image'].iloc[0] 
-         self.data = urllib.request.urlopen(self.url).read()
-         self.pixmap = QPixmap()
-         self.pixmap.loadFromData(self.data)
-         self.pixmap = self.pixmap.scaled(150, 128)
-         self.im.setPixmap(self.pixmap)
-         # layout.addWidget(self.im)
-         self.link = QtWidgets.QLabel(self)
-         self.link.move(100, 100)
-         self.link.setText(linkTemplate.format('https://www.allrecipes.com/recipe/' + str(df_recipes.loc[df_recipes['RecipeID'] == r[0], 'RecipeID'].iloc[0]), 'Link to Recipe'))
-         self.link.setOpenExternalLinks(True)
-         # layout.addWidget(self.link)
-
-         self.im = QtWidgets.QLabel(self)
-         self.url = df_recipes.loc[df_recipes['RecipeID'] == r[1], 'Image'].iloc[0] 
-         self.data = urllib.request.urlopen(self.url).read()
-         self.pixmap = QPixmap()
-         self.pixmap.loadFromData(self.data)
-         self.pixmap = self.pixmap.scaled(150, 128)
-         self.im.setPixmap(self.pixmap)
-         self.im.move(200, 200)
-         # layout.addWidget(self.im)
-         self.link = QtWidgets.QLabel(self)
-         self.link.move(200, 100)
-         self.link.setText(linkTemplate.format('https://www.allrecipes.com/recipe/' + str(df_recipes.loc[df_recipes['RecipeID'] == r[1], 'RecipeID'].iloc[0]), 'Link to Recipe'))
-         self.link.setOpenExternalLinks(True)
-         # layout.addWidget(self.link)
-         
-         self.im = QtWidgets.QLabel(self)
-         self.url = df_recipes.loc[df_recipes['RecipeID'] == r[2], 'Image'].iloc[0] 
-         self.data = urllib.request.urlopen(self.url).read()
-         self.pixmap = QPixmap()
-         self.pixmap.loadFromData(self.data)
-         self.pixmap = self.pixmap.scaled(150, 128)
-         self.im.setPixmap(self.pixmap)
-         self.im.move(300, 300)
-         # layout.addWidget(self.im)
-         self.link = QtWidgets.QLabel(self)
-         self.link.move(300, 100)
-         self.link.setText(linkTemplate.format('https://www.allrecipes.com/recipe/' + str(df_recipes.loc[df_recipes['RecipeID'] == r[2], 'RecipeID'].iloc[0]), 'Link to Recipe'))
-         self.link.setOpenExternalLinks(True)
-         # layout.addWidget(self.link)  
-         
-         self.im = QtWidgets.QLabel(self)
-         self.url = df_recipes.loc[df_recipes['RecipeID'] == r[3], 'Image'].iloc[0] 
-         self.data = urllib.request.urlopen(self.url).read()
-         self.pixmap = QPixmap()
-         self.pixmap.loadFromData(self.data)
-         self.pixmap = self.pixmap.scaled(150, 128)
-         self.im.setPixmap(self.pixmap)
-         self.im.move(400, 400)
-         # layout.addWidget(self.im)
-         self.link = QtWidgets.QLabel(self)
-         self.link.move(400, 100)
-         self.link.setText(linkTemplate.format('https://www.allrecipes.com/recipe/' + str(df_recipes.loc[df_recipes['RecipeID'] == r[3], 'RecipeID'].iloc[0]), 'Link to Recipe'))
-         self.link.setOpenExternalLinks(True)
-         # layout.addWidget(self.link)  
-         
-         self.im = QtWidgets.QLabel(self)
-         self.url = df_recipes.loc[df_recipes['RecipeID'] == r[4], 'Image'].iloc[0] 
-         self.data = urllib.request.urlopen(self.url).read()
-         self.pixmap = QPixmap()
-         self.pixmap.loadFromData(self.data)
-         self.pixmap = self.pixmap.scaled(150, 128)
-         self.im.setPixmap(self.pixmap)
-         self.im.move(500, 500)
-         # layout.addWidget(self.im)
-         self.link = QtWidgets.QLabel(self)
-         self.link.move(500, 100)
-         self.link.setText(linkTemplate.format('https://www.allrecipes.com/recipe/' + str(df_recipes.loc[df_recipes['RecipeID'] == r[4], 'RecipeID'].iloc[0]), 'Link to Recipe'))
-         self.link.setOpenExternalLinks(True)
-         # layout.addWidget(self.link)
+         self.layout2.addRow(recipes)
       else:
          self.rec = QtWidgets.QLabel(self)
          self.rec.setText('Recommended Meal Plans:')
          self.rec.setFont(myFont)
-         layout.addWidget(self.rec)
+         self.layout2.addWidget(self.rec)
 
          m = meal_plan(x, self.caloriesPM, self.proteinPM, self.fatPM, self.all_data['diet'], self.all_data['allergies'], self.all_data['meals'])
 
@@ -557,16 +560,30 @@ class stacked(QWidget):
          plan.addWidget(self.m2)
          plan.addWidget(self.m3)
 
-         layout.addRow(plan)
+         self.layout2.addRow(plan)
 
       self.buttonBox = QDialogButtonBox(QDialogButtonBox.Ok)
       self.buttonBox.accepted.connect(self.getIngredients)
-      layout.addWidget(self.buttonBox)
+      self.layout2.addWidget(self.buttonBox)
+
+      self.im1 = QtWidgets.QLabel(self)
+      self.im1.move(100, 100)
+      self.im2 = QtWidgets.QLabel(self)
+      self.im2.move(100, 100)
+      self.im3 = QtWidgets.QLabel(self)
+      self.im3.move(100, 100)
+
+      self.link1 = QtWidgets.QLabel(self)
+      self.link1.move(200, 100)
+      self.link2 = QtWidgets.QLabel(self)
+      self.link2.move(200, 100)
+      self.link3 = QtWidgets.QLabel(self)
+      self.link3.move(200, 100)
       
-      self.stack2.setLayout(layout)
+      self.stack2.setLayout(self.layout2)
 
    def stack3UI(self, ing, idds):
-      layout = QFormLayout()
+      self.layout3 = QFormLayout()
 
       if self.all_data['prep'] == "Low":
          x = 1
@@ -583,11 +600,11 @@ class stacked(QWidget):
       self.rec = QtWidgets.QLabel(self)
       self.rec.setText('Ingredients:')
       self.rec.setFont(myFont)
-      layout.addWidget(self.rec)
+      self.layout3.addWidget(self.rec)
 
       self.ingr = QtWidgets.QLabel(self)
       self.ingr.setText(ing)
-      layout.addWidget(self.ingr)
+      self.layout3.addWidget(self.ingr)
 
       ingList = []
       unitList = []
@@ -653,10 +670,10 @@ class stacked(QWidget):
       f.close()
 
       button = QPushButton('Buy on Amazon', self)
-      layout.addWidget(button)
+      self.layout3.addWidget(button)
       button.clicked.connect(self.openAmazon)
 
-      self.stack3.setLayout(layout)
+      self.stack3.setLayout(self.layout3)
 		
    def display(self,i):
       self.Stack.setCurrentIndex(i)
