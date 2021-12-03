@@ -6,6 +6,15 @@ import pandas as pd
 import numpy as np
 import random
 import urllib.request
+from selenium import webdriver
+from selenium.webdriver.support.select import Select
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.firefox.options import Options
+import os
+import json
+import webbrowser
 
 df_recipes = pd.read_csv("../datasets/Recipes.csv")
 df_ing = pd.read_csv("../datasets/Ingredients.csv")
@@ -44,7 +53,7 @@ def vegan_filter(vegan, dfr):
         
     return df
 
-#Exactly the same as allergy_filter. Only this time we return the df elemtns containing the search_term
+#Exactly the same as allergy_filter. Only this time we return the df elements containing the search_term
 def search_filter(search_term, df):
     if len(search_term)>=1 and search_term[0]!='':
         srch = [i+'*' for i in search_term]
@@ -138,7 +147,7 @@ class stacked(QWidget):
       self.leftlist = QListWidget ()
       self.leftlist.insertItem (0, 'Form' )
       self.leftlist.insertItem (1, 'Recommendations' )
-      self.leftlist.insertItem (1, 'Ingredients' )
+      self.leftlist.insertItem (2, 'Ingredients' )
 		
       self.stack1 = QWidget()
       self.stack2 = QWidget()
@@ -269,22 +278,35 @@ class stacked(QWidget):
 
       if self.all_data['output'] == 'Single recipe':
          idd = df_recipes.loc[df_recipes['Title'] == self.r1.text().split('\n')[0], 'RecipeID'].iloc[0]
+         idds = [idd]
          ingg = df_rec2ing.loc[df_rec2ing['RecipeID'] == idd, 'IngredientID'].tolist()
          ing = ""
          for i in ingg:
             ing += df_ing.loc[df_ing['IngredientID'] == i, 'IngredientName'].iloc[0]
             ing += '\n'
       else:
+         idds = []
          ing = ""
          for l in [self.m1.text().split('\n')[2], self.m1.text().split('\n')[10], self.m1.text().split('\n')[18]]:
             idd = df_recipes.loc[df_recipes['Title'] == l, 'RecipeID'].iloc[0]
+            idds.append(idd)
             ingg = df_rec2ing.loc[df_rec2ing['RecipeID'] == idd, 'IngredientID'].tolist()
             for i in ingg:
                if df_ing.loc[df_ing['IngredientID'] == i, 'IngredientName'].iloc[0] not in ing:
                   ing += df_ing.loc[df_ing['IngredientID'] == i, 'IngredientName'].iloc[0]
                   ing += '\n'
       
-      self.stack3UI(ing)
+      self.stack3UI(ing, idds)
+
+   def openAmazon(self):
+      # driver = webdriver.Firefox()
+      driver = webdriver.Safari()
+      driver.get("file://" + os.path.realpath("toAmazon.html"))
+      # driver.find_element_by_name('button').click()
+      # driver.find_element('button').click()
+      driver.implicitly_wait(10)
+      element = driver.find_element('button', "Buy on Amazon")
+      # element.send_keys(Keys.RETURN)
 		
    def stack1UI(self):
       layout = QFormLayout()
@@ -326,7 +348,6 @@ class stacked(QWidget):
       self.stack1.setLayout(layout)
 		
    def stack2UI(self):
-
       layout = QFormLayout()
 
       if self.all_data['prep'] == "Low":
@@ -346,6 +367,8 @@ class stacked(QWidget):
          self.rec.setText('Recommended Recipes:')
          self.rec.setFont(myFont)
          layout.addWidget(self.rec)
+
+         recipes = QHBoxLayout()
 
          r = ind_recipes(x, self.caloriesPM, self.proteinPM, self.fatPM, self.all_data['preferences'], self.all_data['diet'], self.all_data['allergies'])
 
@@ -380,8 +403,6 @@ class stacked(QWidget):
             'Reviews: ' + str(df_recipes.loc[df_recipes['RecipeID'] == r[4], 'No_of_reviews'].iloc[0]) + '\n' + 
             'Calories: ' + str(df_recipes.loc[df_recipes['RecipeID'] == r[4], 'Calories'].iloc[0]))
 
-         recipes = QHBoxLayout()
-
          recipes.addWidget(self.r1)
          recipes.addWidget(self.r2)
          recipes.addWidget(self.r3)
@@ -391,18 +412,18 @@ class stacked(QWidget):
          layout.addRow(recipes)
 
          self.im = QtWidgets.QLabel(self)
+         self.im.move(100, 100)
          self.url = df_recipes.loc[df_recipes['RecipeID'] == r[0], 'Image'].iloc[0] 
          self.data = urllib.request.urlopen(self.url).read()
          self.pixmap = QPixmap()
          self.pixmap.loadFromData(self.data)
          self.pixmap = self.pixmap.scaled(150, 128)
          self.im.setPixmap(self.pixmap)
-         self.im.move(500, 100)
          # layout.addWidget(self.im)
          self.link = QtWidgets.QLabel(self)
-         self.link.setOpenExternalLinks(True)
          self.link.move(100, 100)
          self.link.setText(linkTemplate.format('https://www.allrecipes.com/recipe/' + str(df_recipes.loc[df_recipes['RecipeID'] == r[0], 'RecipeID'].iloc[0]), 'Link to Recipe'))
+         self.link.setOpenExternalLinks(True)
          # layout.addWidget(self.link)
 
          self.im = QtWidgets.QLabel(self)
@@ -415,10 +436,10 @@ class stacked(QWidget):
          self.im.move(200, 200)
          # layout.addWidget(self.im)
          self.link = QtWidgets.QLabel(self)
+         self.link.move(200, 100)
          self.link.setText(linkTemplate.format('https://www.allrecipes.com/recipe/' + str(df_recipes.loc[df_recipes['RecipeID'] == r[1], 'RecipeID'].iloc[0]), 'Link to Recipe'))
          self.link.setOpenExternalLinks(True)
-         self.link.move(200, 100)
-         # layout.addWidget(self.link)  
+         # layout.addWidget(self.link)
          
          self.im = QtWidgets.QLabel(self)
          self.url = df_recipes.loc[df_recipes['RecipeID'] == r[2], 'Image'].iloc[0] 
@@ -430,9 +451,9 @@ class stacked(QWidget):
          self.im.move(300, 300)
          # layout.addWidget(self.im)
          self.link = QtWidgets.QLabel(self)
+         self.link.move(300, 100)
          self.link.setText(linkTemplate.format('https://www.allrecipes.com/recipe/' + str(df_recipes.loc[df_recipes['RecipeID'] == r[2], 'RecipeID'].iloc[0]), 'Link to Recipe'))
          self.link.setOpenExternalLinks(True)
-         self.link.move(300, 100)
          # layout.addWidget(self.link)  
          
          self.im = QtWidgets.QLabel(self)
@@ -445,9 +466,9 @@ class stacked(QWidget):
          self.im.move(400, 400)
          # layout.addWidget(self.im)
          self.link = QtWidgets.QLabel(self)
+         self.link.move(400, 100)
          self.link.setText(linkTemplate.format('https://www.allrecipes.com/recipe/' + str(df_recipes.loc[df_recipes['RecipeID'] == r[3], 'RecipeID'].iloc[0]), 'Link to Recipe'))
          self.link.setOpenExternalLinks(True)
-         self.link.move(400, 100)
          # layout.addWidget(self.link)  
          
          self.im = QtWidgets.QLabel(self)
@@ -460,9 +481,9 @@ class stacked(QWidget):
          self.im.move(500, 500)
          # layout.addWidget(self.im)
          self.link = QtWidgets.QLabel(self)
+         self.link.move(500, 100)
          self.link.setText(linkTemplate.format('https://www.allrecipes.com/recipe/' + str(df_recipes.loc[df_recipes['RecipeID'] == r[4], 'RecipeID'].iloc[0]), 'Link to Recipe'))
          self.link.setOpenExternalLinks(True)
-         self.link.move(500, 100)
          # layout.addWidget(self.link)
       else:
          self.rec = QtWidgets.QLabel(self)
@@ -544,7 +565,7 @@ class stacked(QWidget):
       
       self.stack2.setLayout(layout)
 
-   def stack3UI(self, ing):
+   def stack3UI(self, ing, idds):
       layout = QFormLayout()
 
       if self.all_data['prep'] == "Low":
@@ -568,11 +589,72 @@ class stacked(QWidget):
       self.ingr.setText(ing)
       layout.addWidget(self.ingr)
 
-      # self.link = QtWidgets.QLabel(self)
-      # self.link.setText(linkTemplate.format('https://www.allrecipes.com/recipe/' + str(df_recipes.loc[df_recipes['RecipeID'] == r[0], 'RecipeID'].iloc[0]), 'Buy Ingredients on Amazon'))
-      # self.link.setOpenExternalLinks(True)
-      # self.link.move(100, 100)
-      # layout.addWidget(self.link)
+      ingList = []
+      unitList = []
+      amountList = []
+
+      ingId = []
+      for rID in idds:
+          newDF = df_rec2ing.loc[df_rec2ing['RecipeID'] == rID]
+          ingId += newDF['IngredientID'].tolist()
+          amountList += newDF['Quantity'].tolist()
+          unitList += newDF['Unit'].tolist()
+
+      for i,iD in enumerate(ingId):
+          index = df_ing[df_ing['IngredientID'] == iD].index[0]
+          ingList.append(df_ing.iloc[index]['IngredientName'])
+
+      #adjust units for Amazon
+      for i in range(len(unitList)):
+          if unitList[i] in ["cup", "clove", "pound", "ounce", "clove", "stalk", "quart", "slice", "pint","gallon", "drop"]:
+              unitList[i] = unitList[i].upper() + "S"
+          if unitList[i] == "tablespoon":
+              unitList[i] = "TBSP"
+          if unitList[i] == "teaspoon":
+              unitList[i] = "TSP"
+          if unitList[i] == "leaf":
+              unitList[i] = "LEAVES"
+          if unitList[i] == "pinch":
+              unitList[i] = "PINCHES"
+          if unitList[i] == "dash":
+              unitList[i] = "DE_DASH"
+
+      example = {"ingredients": []}
+
+      for ing, un, amt in zip(ingList, unitList,  amountList):
+         newD = {"name": ing, 
+                     "quantityList":[{"unit": un, "amount": amt}],
+                      "exclusiveOverride": "false"}
+         example['ingredients'].append(newD)
+
+      # convert into JSON:
+      myJSON = json.dumps(example)
+
+      f = open('toAmazon.html','w')
+
+      html_content = """<html>
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width">
+          <title>replit</title>
+          <link href="style.css" rel="stylesheet" type="text/css" />
+        </head>
+        <body>
+            <form method="POST" action="https://www.amazon.com/afx/ingredients/landing">
+           <input type="hidden" name="ingredients" value='""" + myJSON + """'>
+           <input type="submit" value="Buy on Amazon" name = "button">
+         </form>
+
+          <script src="script.js"></script>
+        </body>
+      </html>"""
+
+      f.write(html_content)
+      f.close()
+
+      button = QPushButton('Buy on Amazon', self)
+      layout.addWidget(button)
+      button.clicked.connect(self.openAmazon)
 
       self.stack3.setLayout(layout)
 		
