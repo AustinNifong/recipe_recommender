@@ -12,6 +12,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.firefox.options import Options
+from selenium.webdriver.common.by import By
 import os
 import json
 import webbrowser
@@ -380,30 +381,23 @@ class stacked(QWidget):
          self.link1.setOpenExternalLinks(True)
          self.layout2.addWidget(self.link1)
       else:
+         mm = []
          if self.m1.isChecked():
-            mm = [self.m1.text().split('\n')[2], self.m1.text().split('\n')[10], self.m1.text().split('\n')[18]]
+            for t in range(self.all_data['meals']):
+               mm.append(self.m1.text().split('\n')[8*t+2])
          elif self.m2.isChecked():
-            mm = [self.m2.text().split('\n')[2], self.m2.text().split('\n')[10], self.m2.text().split('\n')[18]]
+            for t in range(self.all_data['meals']):
+               mm.append(self.m2.text().split('\n')[8*t+2])
          elif self.m3.isChecked():
-            mm = [self.m3.text().split('\n')[2], self.m3.text().split('\n')[10], self.m3.text().split('\n')[18]]
+            for t in range(self.all_data['meals']):
+               mm.append(self.m3.text().split('\n')[8*t+2])
          idds = []
          ing = ""
 
-         for t in range(self.all_data['meals']):
+         for t in range(len(mm)):
             idd = df_recipes.loc[df_recipes['Title'] == mm[t], 'RecipeID'].iloc[0]
             idds.append(idd)
             ingg = df_rec2ing.loc[df_rec2ing['RecipeID'] == idd, 'IngredientID'].tolist()
-
-            # self.url = df_recipes.loc[df_recipes['RecipeID'] == idd, 'Image'].iloc[0] 
-            # self.data = urllib.request.urlopen(self.url).read()
-            # self.pixmap = QPixmap()
-            # self.pixmap.loadFromData(self.data)
-            # self.pixmap = self.pixmap.scaled(100, 70)
-            # self.im1.setPixmap(self.pixmap)
-            # self.layout2.addWidget(self.im1)
-
-            # self.link1.setOpenExternalLinks(True)
-            # self.layout2.addWidget(QLabel(linkTemplate.format('https://www.allrecipes.com/recipe/' + str(idd), 'Link to Recipe'), self))
 
             self.layout2.addWidget(QLabel('https://www.allrecipes.com/recipe/' + str(idd), self))
 
@@ -417,8 +411,7 @@ class stacked(QWidget):
    def openAmazon(self):
       driver = webdriver.Chrome()
       driver.get("file://" + os.path.realpath("toAmazon.html"))
-      driver.find_element_by_name('button').click()
-      driver.find_element('button').click()
+      driver.find_element(By.CLASS_NAME, "button").click()
 		
    def stack1UI(self):
       self.layout1 = QFormLayout()
