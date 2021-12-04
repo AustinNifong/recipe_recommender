@@ -94,7 +94,7 @@ def meal_plan(x, cals, protein, fat, vegan, allergies, meals):
     df['score'] = (df.Average_rating*np.log10(df.No_of_reviews)) - (x*df.Prep_time/60)
     df.sort_values('score', ascending=False, inplace=True)
     ind_list = list(df['RecipeID'].iloc[0:5*meals])
-    filtered_list = [random.sample(ind_list, k = 3) for i in range(0,meals)]
+    filtered_list = [random.sample(ind_list, k = meals) for i in range(0,3)]
     return filtered_list
 
 
@@ -269,6 +269,78 @@ class stacked(QWidget):
    def getFat(self):
       return self.caloriesD * 0.3 / 9
 
+   def refresh(self):
+      if self.all_data['output'] == 'Single recipe':
+         self.layout2.removeWidget(self.r1)
+         self.layout2.removeWidget(self.r2)
+         self.layout2.removeWidget(self.r3)
+         self.layout2.removeWidget(self.r4)
+         self.layout2.removeWidget(self.r5)
+
+         r = ind_recipes(self.x, self.caloriesPM, self.proteinPM, self.fatPM, self.all_data['preferences'], self.all_data['diet'], self.all_data['allergies'])
+
+         self.r1 = QRadioButton(df_recipes.loc[df_recipes['RecipeID'] == r[0], 'Title'].iloc[0] + '\n\n' + 
+            'Serving Size: ' + str(df_recipes.loc[df_recipes['RecipeID'] == r[0], 'Serving_size'].iloc[0]) + '\n' + 
+            'Prep Time: ' + str(df_recipes.loc[df_recipes['RecipeID'] == r[0], 'Prep_time'].iloc[0]) + '\n' + 
+            'Average Rating: ' + str(round(df_recipes.loc[df_recipes['RecipeID'] == r[0], 'Average_rating'].iloc[0], 2)) + '\n' + 
+            'Reviews: ' + str(df_recipes.loc[df_recipes['RecipeID'] == r[0], 'No_of_reviews'].iloc[0]) + '\n' + 
+            'Calories: ' + str(df_recipes.loc[df_recipes['RecipeID'] == r[0], 'Calories'].iloc[0]))
+         self.r2 = QRadioButton(df_recipes.loc[df_recipes['RecipeID'] == r[1], 'Title'].iloc[0] + '\n\n' + 
+            'Serving Size: ' + str(df_recipes.loc[df_recipes['RecipeID'] == r[1], 'Serving_size'].iloc[0]) + '\n' + 
+            'Prep Time: ' + str(df_recipes.loc[df_recipes['RecipeID'] == r[1], 'Prep_time'].iloc[0]) + '\n' + 
+            'Average Rating: ' + str(round(df_recipes.loc[df_recipes['RecipeID'] == r[1], 'Average_rating'].iloc[0], 2)) + '\n' + 
+            'Reviews: ' + str(df_recipes.loc[df_recipes['RecipeID'] == r[1], 'No_of_reviews'].iloc[0]) + '\n' + 
+            'Calories: ' + str(df_recipes.loc[df_recipes['RecipeID'] == r[1], 'Calories'].iloc[0]))
+         self.r3 = QRadioButton(df_recipes.loc[df_recipes['RecipeID'] == r[2], 'Title'].iloc[0] + '\n\n' + 
+            'Serving Size: ' + str(df_recipes.loc[df_recipes['RecipeID'] == r[2], 'Serving_size'].iloc[0]) + '\n' + 
+            'Prep Time: ' + str(df_recipes.loc[df_recipes['RecipeID'] == r[2], 'Prep_time'].iloc[0]) + '\n' + 
+            'Average Rating: ' + str(round(df_recipes.loc[df_recipes['RecipeID'] == r[2], 'Average_rating'].iloc[0], 2)) + '\n' + 
+            'Reviews: ' + str(df_recipes.loc[df_recipes['RecipeID'] == r[2], 'No_of_reviews'].iloc[0]) + '\n' + 
+            'Calories: ' + str(df_recipes.loc[df_recipes['RecipeID'] == r[2], 'Calories'].iloc[0]))
+         self.r4 = QRadioButton(df_recipes.loc[df_recipes['RecipeID'] == r[3], 'Title'].iloc[0] + '\n\n' + 
+            'Serving Size: ' + str(df_recipes.loc[df_recipes['RecipeID'] == r[3], 'Serving_size'].iloc[0]) + '\n' + 
+            'Prep Time: ' + str(df_recipes.loc[df_recipes['RecipeID'] == r[3], 'Prep_time'].iloc[0]) + '\n' + 
+            'Average Rating: ' + str(round(df_recipes.loc[df_recipes['RecipeID'] == r[3], 'Average_rating'].iloc[0], 2)) + '\n' + 
+            'Reviews: ' + str(df_recipes.loc[df_recipes['RecipeID'] == r[3], 'No_of_reviews'].iloc[0]) + '\n' + 
+            'Calories: ' + str(df_recipes.loc[df_recipes['RecipeID'] == r[3], 'Calories'].iloc[0]))
+         self.r5 = QRadioButton(df_recipes.loc[df_recipes['RecipeID'] == r[4], 'Title'].iloc[0] + '\n\n' + 
+            'Serving Size: ' + str(df_recipes.loc[df_recipes['RecipeID'] == r[4], 'Serving_size'].iloc[0]) + '\n' + 
+            'Prep Time: ' + str(df_recipes.loc[df_recipes['RecipeID'] == r[4], 'Prep_time'].iloc[0]) + '\n' + 
+            'Average Rating: ' + str(round(df_recipes.loc[df_recipes['RecipeID'] == r[4], 'Average_rating'].iloc[0], 2)) + '\n' + 
+            'Reviews: ' + str(df_recipes.loc[df_recipes['RecipeID'] == r[4], 'No_of_reviews'].iloc[0]) + '\n' + 
+            'Calories: ' + str(df_recipes.loc[df_recipes['RecipeID'] == r[4], 'Calories'].iloc[0]))
+
+         self.recipes.addWidget(self.r1)
+         self.recipes.addWidget(self.r2)
+         self.recipes.addWidget(self.r3)
+         self.recipes.addWidget(self.r4)
+         self.recipes.addWidget(self.r5)
+      else:
+         self.layout2.removeWidget(self.m1)
+         self.layout2.removeWidget(self.m2)
+         self.layout2.removeWidget(self.m3)
+
+         m = meal_plan(self.x, self.caloriesPM, self.proteinPM, self.fatPM, self.all_data['diet'], self.all_data['allergies'], self.all_data['meals'])
+
+         text1 = 'MEAL PLAN 1'
+         for t in range(self.all_data['meals']):
+            text1 += '\n\n' + df_recipes.loc[df_recipes['RecipeID'] == m[0][t], 'Title'].iloc[0] + '\n\n' + 'Serving Size: ' + str(df_recipes.loc[df_recipes['RecipeID'] == m[0][t], 'Serving_size'].iloc[0]) + '\n' + 'Prep Time: ' + str(df_recipes.loc[df_recipes['RecipeID'] == m[0][t], 'Prep_time'].iloc[0]) + '\n' + 'Average Rating: ' + str(round(df_recipes.loc[df_recipes['RecipeID'] == m[0][t], 'Average_rating'].iloc[0], 2)) + '\n' + 'Reviews: ' + str(df_recipes.loc[df_recipes['RecipeID'] == m[0][t], 'No_of_reviews'].iloc[0]) + '\n' + 'Calories: ' + str(df_recipes.loc[df_recipes['RecipeID'] == m[0][t], 'Calories'].iloc[0])
+         self.m1 = QRadioButton(text1)
+
+         text2 = 'MEAL PLAN 2'
+         for t in range(self.all_data['meals']):
+            text2 += '\n\n' + df_recipes.loc[df_recipes['RecipeID'] == m[1][t], 'Title'].iloc[0] + '\n\n' + 'Serving Size: ' + str(df_recipes.loc[df_recipes['RecipeID'] == m[1][t], 'Serving_size'].iloc[0]) + '\n' + 'Prep Time: ' + str(df_recipes.loc[df_recipes['RecipeID'] == m[1][t], 'Prep_time'].iloc[0]) + '\n' + 'Average Rating: ' + str(round(df_recipes.loc[df_recipes['RecipeID'] == m[1][t], 'Average_rating'].iloc[0], 2)) + '\n' + 'Reviews: ' + str(df_recipes.loc[df_recipes['RecipeID'] == m[1][t], 'No_of_reviews'].iloc[0]) + '\n' + 'Calories: ' + str(df_recipes.loc[df_recipes['RecipeID'] == m[1][t], 'Calories'].iloc[0])
+         self.m2 = QRadioButton(text2)
+
+         text3 = 'MEAL PLAN 3'
+         for t in range(self.all_data['meals']):
+            text3 += '\n\n' + df_recipes.loc[df_recipes['RecipeID'] == m[2][t], 'Title'].iloc[0] + '\n\n' + 'Serving Size: ' + str(df_recipes.loc[df_recipes['RecipeID'] == m[2][t], 'Serving_size'].iloc[0]) + '\n' + 'Prep Time: ' + str(df_recipes.loc[df_recipes['RecipeID'] == m[2][t], 'Prep_time'].iloc[0]) + '\n' + 'Average Rating: ' + str(round(df_recipes.loc[df_recipes['RecipeID'] == m[2][t], 'Average_rating'].iloc[0], 2)) + '\n' + 'Reviews: ' + str(df_recipes.loc[df_recipes['RecipeID'] == m[2][t], 'No_of_reviews'].iloc[0]) + '\n' + 'Calories: ' + str(df_recipes.loc[df_recipes['RecipeID'] == m[2][t], 'Calories'].iloc[0])
+         self.m3 = QRadioButton(text3)
+
+         self.plan.addWidget(self.m1)
+         self.plan.addWidget(self.m2)
+         self.plan.addWidget(self.m3)
+
    def getIngredients(self):
       self.requirements.setText('')
       self.D.setText('')
@@ -317,68 +389,28 @@ class stacked(QWidget):
          idds = []
          ing = ""
 
-         idd = df_recipes.loc[df_recipes['Title'] == mm[0], 'RecipeID'].iloc[0]
-         idds.append(idd)
-         ingg = df_rec2ing.loc[df_rec2ing['RecipeID'] == idd, 'IngredientID'].tolist()
+         for t in range(self.all_data['meals']):
+            idd = df_recipes.loc[df_recipes['Title'] == mm[t], 'RecipeID'].iloc[0]
+            idds.append(idd)
+            ingg = df_rec2ing.loc[df_rec2ing['RecipeID'] == idd, 'IngredientID'].tolist()
 
-         self.url = df_recipes.loc[df_recipes['RecipeID'] == idd, 'Image'].iloc[0] 
-         self.data = urllib.request.urlopen(self.url).read()
-         self.pixmap = QPixmap()
-         self.pixmap.loadFromData(self.data)
-         self.pixmap = self.pixmap.scaled(170, 120)
-         self.im1.setPixmap(self.pixmap)
-         self.layout2.addWidget(self.im1)
+            # self.url = df_recipes.loc[df_recipes['RecipeID'] == idd, 'Image'].iloc[0] 
+            # self.data = urllib.request.urlopen(self.url).read()
+            # self.pixmap = QPixmap()
+            # self.pixmap.loadFromData(self.data)
+            # self.pixmap = self.pixmap.scaled(100, 70)
+            # self.im1.setPixmap(self.pixmap)
+            # self.layout2.addWidget(self.im1)
 
-         self.link1.setText(linkTemplate.format('https://www.allrecipes.com/recipe/' + str(idd), 'Link to Recipe'))
-         self.link1.setOpenExternalLinks(True)
-         self.layout2.addWidget(self.link1)
+            # self.link1.setOpenExternalLinks(True)
+            # self.layout2.addWidget(QLabel(linkTemplate.format('https://www.allrecipes.com/recipe/' + str(idd), 'Link to Recipe'), self))
 
-         for i in ingg:
-            if df_ing.loc[df_ing['IngredientID'] == i, 'IngredientName'].iloc[0] not in ing:
-               ing += df_ing.loc[df_ing['IngredientID'] == i, 'IngredientName'].iloc[0]
-               ing += '\n'
+            self.layout2.addWidget(QLabel('https://www.allrecipes.com/recipe/' + str(idd), self))
 
-         idd = df_recipes.loc[df_recipes['Title'] == mm[1], 'RecipeID'].iloc[0]
-         idds.append(idd)
-         ingg = df_rec2ing.loc[df_rec2ing['RecipeID'] == idd, 'IngredientID'].tolist()
-
-         self.url = df_recipes.loc[df_recipes['RecipeID'] == idd, 'Image'].iloc[0] 
-         self.data = urllib.request.urlopen(self.url).read()
-         self.pixmap = QPixmap()
-         self.pixmap.loadFromData(self.data)
-         self.pixmap = self.pixmap.scaled(170, 120)
-         self.im2.setPixmap(self.pixmap)
-         self.layout2.addWidget(self.im2)
-
-         self.link2.setText(linkTemplate.format('https://www.allrecipes.com/recipe/' + str(idd), 'Link to Recipe'))
-         self.link2.setOpenExternalLinks(True)
-         self.layout2.addWidget(self.link2)
-
-         for i in ingg:
-            if df_ing.loc[df_ing['IngredientID'] == i, 'IngredientName'].iloc[0] not in ing:
-               ing += df_ing.loc[df_ing['IngredientID'] == i, 'IngredientName'].iloc[0]
-               ing += '\n'
-
-         idd = df_recipes.loc[df_recipes['Title'] == mm[2], 'RecipeID'].iloc[0]
-         idds.append(idd)
-         ingg = df_rec2ing.loc[df_rec2ing['RecipeID'] == idd, 'IngredientID'].tolist()
-
-         self.url = df_recipes.loc[df_recipes['RecipeID'] == idd, 'Image'].iloc[0] 
-         self.data = urllib.request.urlopen(self.url).read()
-         self.pixmap = QPixmap()
-         self.pixmap.loadFromData(self.data)
-         self.pixmap = self.pixmap.scaled(170, 120)
-         self.im3.setPixmap(self.pixmap)
-         self.layout2.addWidget(self.im3)
-
-         self.link3.setText(linkTemplate.format('https://www.allrecipes.com/recipe/' + str(idd), 'Link to Recipe'))
-         self.link3.setOpenExternalLinks(True)
-         self.layout2.addWidget(self.link3)
-
-         for i in ingg:
-            if df_ing.loc[df_ing['IngredientID'] == i, 'IngredientName'].iloc[0] not in ing:
-               ing += df_ing.loc[df_ing['IngredientID'] == i, 'IngredientName'].iloc[0]
-               ing += '\n'
+            for i in ingg:
+               if df_ing.loc[df_ing['IngredientID'] == i, 'IngredientName'].iloc[0] not in ing:
+                  ing += df_ing.loc[df_ing['IngredientID'] == i, 'IngredientName'].iloc[0]
+                  ing += '\n'
       
       self.stack3UI(ing, idds)
 
@@ -408,21 +440,21 @@ class stacked(QWidget):
       self.layout1.addWidget(self.buttonBox)
 
       self.requirements = QtWidgets.QLabel(self)
-      self.requirements.move(330, 570)
+      self.requirements.move(330, 600)
       self.requirements.resize(505,30)
 
       self.D = QtWidgets.QLabel(self)
-      self.D.move(340, 600)
+      self.D.move(340, 630)
       self.D.resize(70,30)
       self.PM = QtWidgets.QLabel(self)
-      self.PM.move(345, 630)
+      self.PM.move(345, 660)
       self.PM.resize(60,30)
 
       self.DV = QtWidgets.QLabel(self)
-      self.DV.move(415, 600)
+      self.DV.move(415, 630)
       self.DV.resize(160,30)
       self.PMV = QtWidgets.QLabel(self)
-      self.PMV.move(410, 630)
+      self.PMV.move(410, 660)
       self.PMV.resize(160,30)
 
       self.stack1.setLayout(self.layout1)
@@ -431,11 +463,11 @@ class stacked(QWidget):
       self.layout2 = QFormLayout()
 
       if self.all_data['prep'] == "Low":
-         x = 1
+         self.x = 1
       elif self.all_data['prep'] == "Medium":
-         x = 3
+         self.x = 3
       else:
-         x = 5
+         self.x = 5
 
       myFont = QtGui.QFont()
       myFont.setBold(True)
@@ -446,9 +478,9 @@ class stacked(QWidget):
          self.rec.setFont(myFont)
          self.layout2.addWidget(self.rec)
 
-         recipes = QHBoxLayout()
+         self.recipes = QHBoxLayout()
 
-         r = ind_recipes(x, self.caloriesPM, self.proteinPM, self.fatPM, self.all_data['preferences'], self.all_data['diet'], self.all_data['allergies'])
+         r = ind_recipes(self.x, self.caloriesPM, self.proteinPM, self.fatPM, self.all_data['preferences'], self.all_data['diet'], self.all_data['allergies'])
 
          self.r1 = QRadioButton(df_recipes.loc[df_recipes['RecipeID'] == r[0], 'Title'].iloc[0] + '\n\n' + 
             'Serving Size: ' + str(df_recipes.loc[df_recipes['RecipeID'] == r[0], 'Serving_size'].iloc[0]) + '\n' + 
@@ -481,104 +513,54 @@ class stacked(QWidget):
             'Reviews: ' + str(df_recipes.loc[df_recipes['RecipeID'] == r[4], 'No_of_reviews'].iloc[0]) + '\n' + 
             'Calories: ' + str(df_recipes.loc[df_recipes['RecipeID'] == r[4], 'Calories'].iloc[0]))
 
-         recipes.addWidget(self.r1)
-         recipes.addWidget(self.r2)
-         recipes.addWidget(self.r3)
-         recipes.addWidget(self.r4)
-         recipes.addWidget(self.r5)
+         self.recipes.addWidget(self.r1)
+         self.recipes.addWidget(self.r2)
+         self.recipes.addWidget(self.r3)
+         self.recipes.addWidget(self.r4)
+         self.recipes.addWidget(self.r5)
 
-         self.layout2.addRow(recipes)
+         self.layout2.addRow(self.recipes)
       else:
          self.rec = QtWidgets.QLabel(self)
          self.rec.setText('Recommended Meal Plans:')
          self.rec.setFont(myFont)
          self.layout2.addWidget(self.rec)
 
-         m = meal_plan(x, self.caloriesPM, self.proteinPM, self.fatPM, self.all_data['diet'], self.all_data['allergies'], self.all_data['meals'])
+         m = meal_plan(self.x, self.caloriesPM, self.proteinPM, self.fatPM, self.all_data['diet'], self.all_data['allergies'], self.all_data['meals'])
 
-         self.m1 = QRadioButton('MEAL PLAN 1' + '\n\n' + 
-            df_recipes.loc[df_recipes['RecipeID'] == m[0][0], 'Title'].iloc[0] + '\n\n' + 
-            'Serving Size: ' + str(df_recipes.loc[df_recipes['RecipeID'] == m[0][0], 'Serving_size'].iloc[0]) + '\n' + 
-            'Prep Time: ' + str(df_recipes.loc[df_recipes['RecipeID'] == m[0][0], 'Prep_time'].iloc[0]) + '\n' + 
-            'Average Rating: ' + str(round(df_recipes.loc[df_recipes['RecipeID'] == m[0][0], 'Average_rating'].iloc[0], 2)) + '\n' + 
-            'Reviews: ' + str(df_recipes.loc[df_recipes['RecipeID'] == m[0][0], 'No_of_reviews'].iloc[0]) + '\n' + 
-            'Calories: ' + str(df_recipes.loc[df_recipes['RecipeID'] == m[0][0], 'Calories'].iloc[0]) + '\n\n' + 
-            df_recipes.loc[df_recipes['RecipeID'] == m[0][1], 'Title'].iloc[0] + '\n\n' + 
-            'Serving Size: ' + str(df_recipes.loc[df_recipes['RecipeID'] == m[0][1], 'Serving_size'].iloc[0]) + '\n' + 
-            'Prep Time: ' + str(df_recipes.loc[df_recipes['RecipeID'] == m[0][1], 'Prep_time'].iloc[0]) + '\n' + 
-            'Average Rating: ' + str(round(df_recipes.loc[df_recipes['RecipeID'] == m[0][1], 'Average_rating'].iloc[0], 2)) + '\n' + 
-            'Reviews: ' + str(df_recipes.loc[df_recipes['RecipeID'] == m[0][1], 'No_of_reviews'].iloc[0]) + '\n' + 
-            'Calories: ' + str(df_recipes.loc[df_recipes['RecipeID'] == m[0][1], 'Calories'].iloc[0]) + '\n\n' + 
-            df_recipes.loc[df_recipes['RecipeID'] == m[0][2], 'Title'].iloc[0] + '\n\n' + 
-            'Serving Size: ' + str(df_recipes.loc[df_recipes['RecipeID'] == m[0][2], 'Serving_size'].iloc[0]) + '\n' + 
-            'Prep Time: ' + str(df_recipes.loc[df_recipes['RecipeID'] == m[0][2], 'Prep_time'].iloc[0]) + '\n' + 
-            'Average Rating: ' + str(round(df_recipes.loc[df_recipes['RecipeID'] == m[0][2], 'Average_rating'].iloc[0], 2)) + '\n' + 
-            'Reviews: ' + str(df_recipes.loc[df_recipes['RecipeID'] == m[0][2], 'No_of_reviews'].iloc[0]) + '\n' + 
-            'Calories: ' + str(df_recipes.loc[df_recipes['RecipeID'] == m[0][2], 'Calories'].iloc[0]))
-         self.m2 = QRadioButton('MEAL PLAN 2' + '\n\n' + 
-            df_recipes.loc[df_recipes['RecipeID'] == m[1][0], 'Title'].iloc[0] + '\n\n' + 
-            'Serving Size: ' + str(df_recipes.loc[df_recipes['RecipeID'] == m[1][0], 'Serving_size'].iloc[0]) + '\n' + 
-            'Prep Time: ' + str(df_recipes.loc[df_recipes['RecipeID'] == m[1][0], 'Prep_time'].iloc[0]) + '\n' + 
-            'Average Rating: ' + str(round(df_recipes.loc[df_recipes['RecipeID'] == m[1][0], 'Average_rating'].iloc[0], 2)) + '\n' + 
-            'Reviews: ' + str(df_recipes.loc[df_recipes['RecipeID'] == m[1][0], 'No_of_reviews'].iloc[0]) + '\n' + 
-            'Calories: ' + str(df_recipes.loc[df_recipes['RecipeID'] == m[1][0], 'Calories'].iloc[0]) + '\n\n' + 
-            df_recipes.loc[df_recipes['RecipeID'] == m[1][1], 'Title'].iloc[0] + '\n\n' + 
-            'Serving Size: ' + str(df_recipes.loc[df_recipes['RecipeID'] == m[1][1], 'Serving_size'].iloc[0]) + '\n' + 
-            'Prep Time: ' + str(df_recipes.loc[df_recipes['RecipeID'] == m[1][1], 'Prep_time'].iloc[0]) + '\n' + 
-            'Average Rating: ' + str(round(df_recipes.loc[df_recipes['RecipeID'] == m[1][1], 'Average_rating'].iloc[0], 2)) + '\n' + 
-            'Reviews: ' + str(df_recipes.loc[df_recipes['RecipeID'] == m[1][1], 'No_of_reviews'].iloc[0]) + '\n' + 
-            'Calories: ' + str(df_recipes.loc[df_recipes['RecipeID'] == m[1][1], 'Calories'].iloc[0]) + '\n\n' + 
-            df_recipes.loc[df_recipes['RecipeID'] == m[1][2], 'Title'].iloc[0] + '\n\n' + 
-            'Serving Size: ' + str(df_recipes.loc[df_recipes['RecipeID'] == m[1][2], 'Serving_size'].iloc[0]) + '\n' + 
-            'Prep Time: ' + str(df_recipes.loc[df_recipes['RecipeID'] == m[1][2], 'Prep_time'].iloc[0]) + '\n' + 
-            'Average Rating: ' + str(round(df_recipes.loc[df_recipes['RecipeID'] == m[1][2], 'Average_rating'].iloc[0], 2)) + '\n' + 
-            'Reviews: ' + str(df_recipes.loc[df_recipes['RecipeID'] == m[1][2], 'No_of_reviews'].iloc[0]) + '\n' + 
-            'Calories: ' + str(df_recipes.loc[df_recipes['RecipeID'] == m[1][2], 'Calories'].iloc[0]))
-         self.m3 = QRadioButton('MEAL PLAN 3' + '\n\n' + 
-            df_recipes.loc[df_recipes['RecipeID'] == m[2][0], 'Title'].iloc[0] + '\n\n' + 
-            'Serving Size: ' + str(df_recipes.loc[df_recipes['RecipeID'] == m[2][0], 'Serving_size'].iloc[0]) + '\n' + 
-            'Prep Time: ' + str(df_recipes.loc[df_recipes['RecipeID'] == m[2][0], 'Prep_time'].iloc[0]) + '\n' + 
-            'Average Rating: ' + str(round(df_recipes.loc[df_recipes['RecipeID'] == m[2][0], 'Average_rating'].iloc[0], 2)) + '\n' + 
-            'Reviews: ' + str(df_recipes.loc[df_recipes['RecipeID'] == m[2][0], 'No_of_reviews'].iloc[0]) + '\n' + 
-            'Calories: ' + str(df_recipes.loc[df_recipes['RecipeID'] == m[2][0], 'Calories'].iloc[0]) + '\n\n' + 
-            df_recipes.loc[df_recipes['RecipeID'] == m[2][1], 'Title'].iloc[0] + '\n\n' + 
-            'Serving Size: ' + str(df_recipes.loc[df_recipes['RecipeID'] == m[2][1], 'Serving_size'].iloc[0]) + '\n' + 
-            'Prep Time: ' + str(df_recipes.loc[df_recipes['RecipeID'] == m[2][1], 'Prep_time'].iloc[0]) + '\n' + 
-            'Average Rating: ' + str(round(df_recipes.loc[df_recipes['RecipeID'] == m[2][1], 'Average_rating'].iloc[0], 2)) + '\n' + 
-            'Reviews: ' + str(df_recipes.loc[df_recipes['RecipeID'] == m[2][1], 'No_of_reviews'].iloc[0]) + '\n' + 
-            'Calories: ' + str(df_recipes.loc[df_recipes['RecipeID'] == m[2][1], 'Calories'].iloc[0]) + '\n\n' + 
-            df_recipes.loc[df_recipes['RecipeID'] == m[2][2], 'Title'].iloc[0] + '\n\n' + 
-            'Serving Size: ' + str(df_recipes.loc[df_recipes['RecipeID'] == m[2][2], 'Serving_size'].iloc[0]) + '\n' + 
-            'Prep Time: ' + str(df_recipes.loc[df_recipes['RecipeID'] == m[2][2], 'Prep_time'].iloc[0]) + '\n' + 
-            'Average Rating: ' + str(round(df_recipes.loc[df_recipes['RecipeID'] == m[2][2], 'Average_rating'].iloc[0], 2)) + '\n' + 
-            'Reviews: ' + str(df_recipes.loc[df_recipes['RecipeID'] == m[2][2], 'No_of_reviews'].iloc[0]) + '\n' + 
-            'Calories: ' + str(df_recipes.loc[df_recipes['RecipeID'] == m[2][2], 'Calories'].iloc[0]))
+         text1 = 'MEAL PLAN 1'
+         for t in range(self.all_data['meals']):
+            text1 += '\n\n' + df_recipes.loc[df_recipes['RecipeID'] == m[0][t], 'Title'].iloc[0] + '\n\n' + 'Serving Size: ' + str(df_recipes.loc[df_recipes['RecipeID'] == m[0][t], 'Serving_size'].iloc[0]) + '\n' + 'Prep Time: ' + str(df_recipes.loc[df_recipes['RecipeID'] == m[0][t], 'Prep_time'].iloc[0]) + '\n' + 'Average Rating: ' + str(round(df_recipes.loc[df_recipes['RecipeID'] == m[0][t], 'Average_rating'].iloc[0], 2)) + '\n' + 'Reviews: ' + str(df_recipes.loc[df_recipes['RecipeID'] == m[0][t], 'No_of_reviews'].iloc[0]) + '\n' + 'Calories: ' + str(df_recipes.loc[df_recipes['RecipeID'] == m[0][t], 'Calories'].iloc[0])
+         self.m1 = QRadioButton(text1)
 
-         plan = QHBoxLayout()
+         text2 = 'MEAL PLAN 2'
+         for t in range(self.all_data['meals']):
+            text2 += '\n\n' + df_recipes.loc[df_recipes['RecipeID'] == m[1][t], 'Title'].iloc[0] + '\n\n' + 'Serving Size: ' + str(df_recipes.loc[df_recipes['RecipeID'] == m[1][t], 'Serving_size'].iloc[0]) + '\n' + 'Prep Time: ' + str(df_recipes.loc[df_recipes['RecipeID'] == m[1][t], 'Prep_time'].iloc[0]) + '\n' + 'Average Rating: ' + str(round(df_recipes.loc[df_recipes['RecipeID'] == m[1][t], 'Average_rating'].iloc[0], 2)) + '\n' + 'Reviews: ' + str(df_recipes.loc[df_recipes['RecipeID'] == m[1][t], 'No_of_reviews'].iloc[0]) + '\n' + 'Calories: ' + str(df_recipes.loc[df_recipes['RecipeID'] == m[1][t], 'Calories'].iloc[0])
+         self.m2 = QRadioButton(text2)
 
-         plan.addWidget(self.m1)
-         plan.addWidget(self.m2)
-         plan.addWidget(self.m3)
+         text3 = 'MEAL PLAN 3'
+         for t in range(self.all_data['meals']):
+            text3 += '\n\n' + df_recipes.loc[df_recipes['RecipeID'] == m[2][t], 'Title'].iloc[0] + '\n\n' + 'Serving Size: ' + str(df_recipes.loc[df_recipes['RecipeID'] == m[2][t], 'Serving_size'].iloc[0]) + '\n' + 'Prep Time: ' + str(df_recipes.loc[df_recipes['RecipeID'] == m[2][t], 'Prep_time'].iloc[0]) + '\n' + 'Average Rating: ' + str(round(df_recipes.loc[df_recipes['RecipeID'] == m[2][t], 'Average_rating'].iloc[0], 2)) + '\n' + 'Reviews: ' + str(df_recipes.loc[df_recipes['RecipeID'] == m[2][t], 'No_of_reviews'].iloc[0]) + '\n' + 'Calories: ' + str(df_recipes.loc[df_recipes['RecipeID'] == m[2][t], 'Calories'].iloc[0])
+         self.m3 = QRadioButton(text3)
 
-         self.layout2.addRow(plan)
+         self.plan = QHBoxLayout()
+
+         self.plan.addWidget(self.m1)
+         self.plan.addWidget(self.m2)
+         self.plan.addWidget(self.m3)
+
+         self.layout2.addRow(self.plan)
 
       self.buttonBox = QDialogButtonBox(QDialogButtonBox.Ok)
       self.buttonBox.accepted.connect(self.getIngredients)
       self.layout2.addWidget(self.buttonBox)
 
-      self.im1 = QtWidgets.QLabel(self)
-      self.im1.move(100, 100)
-      self.im2 = QtWidgets.QLabel(self)
-      self.im2.move(100, 100)
-      self.im3 = QtWidgets.QLabel(self)
-      self.im3.move(100, 100)
+      button = QPushButton('Refresh', self)
+      self.layout2.addWidget(button)
+      button.clicked.connect(self.refresh)
 
+      self.im1 = QtWidgets.QLabel(self)
       self.link1 = QtWidgets.QLabel(self)
-      self.link1.move(200, 100)
-      self.link2 = QtWidgets.QLabel(self)
-      self.link2.move(200, 100)
-      self.link3 = QtWidgets.QLabel(self)
-      self.link3.move(200, 100)
       
       self.stack2.setLayout(self.layout2)
 
@@ -586,11 +568,11 @@ class stacked(QWidget):
       self.layout3 = QFormLayout()
 
       if self.all_data['prep'] == "Low":
-         x = 1
+         self.x = 1
       elif self.all_data['prep'] == "Medium":
-         x = 3
+         self.x = 3
       else:
-         x = 5
+         self.x = 5
 
       linkTemplate = '<a href={0}>{1}</a>'
 
@@ -644,9 +626,7 @@ class stacked(QWidget):
                       "exclusiveOverride": "false"}
          example['ingredients'].append(newD)
 
-      # convert into JSON:
       myJSON = json.dumps(example)
-
       f = open('toAmazon.html','w')
 
       html_content = """<html>
