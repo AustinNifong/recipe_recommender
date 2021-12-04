@@ -12,10 +12,11 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.firefox.options import Options
-from selenium.webdriver.common.by import By
 import os
 import json
 import webbrowser
+import warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning) 
 
 df_recipes = pd.read_csv("../datasets/Recipes.csv")
 df_ing = pd.read_csv("../datasets/Ingredients.csv")
@@ -409,9 +410,12 @@ class stacked(QWidget):
       self.stack3UI(ing, idds)
 
    def openAmazon(self):
+      global driver
       driver = webdriver.Chrome()
       driver.get("file://" + os.path.realpath("toAmazon.html"))
-      driver.find_element(By.CLASS_NAME, "button").click()
+      driver.implicitly_wait(10)
+      driver.find_element_by_name('button').click()
+      # driver.find_element(By.NAME, 'button').click()
 		
    def stack1UI(self):
       self.layout1 = QFormLayout()
