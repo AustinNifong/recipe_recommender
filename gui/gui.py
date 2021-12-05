@@ -266,7 +266,8 @@ class stacked(QWidget):
             return (267.9775 + (11.322 * self.all_data['weight'] / 2.205) + (3.9485 * (self.all_data['height feet'] * 12 + self.all_data['height inches']) * 2.54) - (5.0035 * self.all_data['age'])) * 1.2
 
    def getProtein(self):
-      return self.all_data['weight'] / 20 * 7
+      return self.caloriesD * 0.3 / 4
+      # return self.all_data['weight'] / 20 * 7
 
    def getFat(self):
       return self.caloriesD * 0.3 / 9
